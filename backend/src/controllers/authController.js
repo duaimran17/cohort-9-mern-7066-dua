@@ -27,7 +27,7 @@ exports.signup = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashedPassword });
 
-    const token = generateToken(user._id, user.tokenVersion); 
+    const token = generateToken(user._id, user.tokenVersion);
     logger.info({ userId: user._id }, 'New user signed up');
 
     res.status(201).json({
@@ -71,8 +71,10 @@ exports.login = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
   try {
-    req.user.tokenVersion += 1;
-    await req.user.save();
+    await User.updateOne(
+      { _id: req.user._id },
+      { $inc: { tokenVersion: 1 } }
+    );
 
     logger.info({ userId: req.user._id }, 'User logged out, token invalidated');
     res.status(200).json({ message: 'Logged out successfully' });
