@@ -9,7 +9,18 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(pinoHttp({ logger }));
+app.use(
+  pinoHttp({
+    logger,
+    serializers: {
+      req: (req) => ({
+        method: req.method,
+        url: req.url ? req.url.split('?')[0] : req.url,
+      }),
+    },
+    redact: ['req.headers.authorization', 'req.headers.cookie'],
+  })
+);
 
 app.get('/', (req, res) => {
   logger.info('Root endpoint hit!');

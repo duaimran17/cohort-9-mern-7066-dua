@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const logger = require('../utils/logger');
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const generateToken = (userId, tokenVersion) => {
+  return jwt.sign({ id: userId, tokenVersion }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 exports.signup = async (req, res, next) => {
@@ -15,6 +15,10 @@ exports.signup = async (req, res, next) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'Email already registered' });
@@ -23,7 +27,7 @@ exports.signup = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashedPassword });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion); 
     logger.info({ userId: user._id }, 'New user signed up');
 
     res.status(201).json({
@@ -53,7 +57,7 @@ exports.login = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion);
     logger.info({ userId: user._id }, 'User logged in');
 
     res.status(200).json({
@@ -67,7 +71,10 @@ exports.login = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
   try {
-    logger.info('User logged out');
+    req.user.tokenVersion += 1;
+    await req.user.save();
+
+    logger.info({ userId: req.user._id }, 'User logged out, token invalidated');
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (err) {
     next(err);
