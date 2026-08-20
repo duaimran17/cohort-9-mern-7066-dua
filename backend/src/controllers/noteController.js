@@ -4,15 +4,24 @@ const logger = require('../utils/logger');
 // POST api notes 
 exports.createNote = async (req, res, next) => {
   try {
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ message: 'Request body is required' });
+    }
+
     const { title, content } = req.body;
 
-    if (!title || !content) {
-      return res.status(400).json({ message: 'Title and content are required' });
+    if (
+      typeof title !== 'string' ||
+      typeof content !== 'string' ||
+      title.trim() === '' ||
+      content.trim() === ''
+    ) {
+      return res.status(400).json({ message: 'Title and content must be non-empty strings' });
     }
 
     const note = await Note.create({
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       owner: req.user._id, // protected middleware
     });
 
@@ -23,7 +32,7 @@ exports.createNote = async (req, res, next) => {
   }
 };
 
-// GET logged user ntoes
+// GET logged user notes
 exports.getNotes = async (req, res, next) => {
   try {
     const notes = await Note.find({ owner: req.user._id }).sort({ updatedAt: -1 });
@@ -33,7 +42,7 @@ exports.getNotes = async (req, res, next) => {
   }
 };
 
-// GET api notes and id
+// GET api notes by id
 exports.getNoteById = async (req, res, next) => {
   try {
     const note = await Note.findOne({ _id: req.params.id, owner: req.user._id });
@@ -48,10 +57,28 @@ exports.getNoteById = async (req, res, next) => {
   }
 };
 
-// PUT my notes api iddd
+// PUT update note
 exports.updateNote = async (req, res, next) => {
   try {
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ message: 'Request body is required' });
+    }
+
     const { title, content } = req.body;
+    const hasTitle = Object.prototype.hasOwnProperty.call(req.body, 'title');
+    const hasContent = Object.prototype.hasOwnProperty.call(req.body, 'content');
+
+    if (!hasTitle && !hasContent) {
+      return res.status(400).json({ message: 'Provide title or content to update' });
+    }
+
+    if (hasTitle && (typeof title !== 'string' || title.trim() === '')) {
+      return res.status(400).json({ message: 'Title must be a non-empty string' });
+    }
+
+    if (hasContent && (typeof content !== 'string' || content.trim() === '')) {
+      return res.status(400).json({ message: 'Content must be a non-empty string' });
+    }
 
     const note = await Note.findOne({ _id: req.params.id, owner: req.user._id });
 
@@ -59,8 +86,8 @@ exports.updateNote = async (req, res, next) => {
       return res.status(404).json({ message: 'Note not found' });
     }
 
-    if (title !== undefined) note.title = title;
-    if (content !== undefined) note.content = content;
+    if (hasTitle) note.title = title.trim();
+    if (hasContent) note.content = content.trim();
 
     await note.save();
 
@@ -71,7 +98,7 @@ exports.updateNote = async (req, res, next) => {
   }
 };
 
-// DELETE 
+// DELETE note
 exports.deleteNote = async (req, res, next) => {
   try {
     const note = await Note.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
