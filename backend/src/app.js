@@ -3,6 +3,7 @@ const cors = require('cors');
 const pinoHttp = require('pino-http');
 const logger = require('./utils/logger');
 const authRoutes = require('./routes/authRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', noteRoutes);
 
 app.use(errorHandler);
 
