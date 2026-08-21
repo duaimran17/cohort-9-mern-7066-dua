@@ -12,17 +12,25 @@ let mongod;
  * Call this in a `before()` hook at the top of each test suite.
  */
 async function connect() {
-  // Disconnect from any previous connection (e.g., if another test suite ran first)
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-  }
-  if (mongod) {
-    await mongod.stop();
-  }
+  try {
+    // Disconnect from any previous connection (e.g., if another test suite ran first)
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+    if (mongod) {
+      await mongod.stop();
+    }
 
-  mongod = await MongoMemoryServer.create();
-  const uri = mongod.getUri();
-  await mongoose.connect(uri);
+    mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    await mongoose.connect(uri);
+  } catch (error) {
+    if (mongod) {
+      await mongod.stop();
+      mongod = null;
+    }
+    throw error;
+  }
 }
 
 /**
@@ -41,11 +49,14 @@ async function clearDatabase() {
  * Call this in an `after()` hook at the end of each test suite.
  */
 async function disconnect() {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
-  if (mongod) {
-    await mongod.stop();
-    mongod = null;
+  try {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+  } finally {
+    if (mongod) {
+      await mongod.stop();
+      mongod = null;
+    }
   }
 }
 

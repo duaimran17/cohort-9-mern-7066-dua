@@ -263,7 +263,7 @@ describe('Notes Routes', function () {
         .get(`${NOTES_BASE}/not-a-valid-id`)
         .set('Authorization', `Bearer ${tokenA}`);
       // CastError → errorHandler maps to 400; application may also return 404
-      expect([400, 404, 500]).to.include(res.status);
+      expect([400, 404]).to.include(res.status);
     });
   });
 

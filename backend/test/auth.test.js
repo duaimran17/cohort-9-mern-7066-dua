@@ -125,10 +125,7 @@ describe('Auth Routes', function () {
       // Fire two requests "simultaneously"
       const [r1, r2] = await Promise.all([signupUser(payload), signupUser(payload)]);
       const statuses = [r1.status, r2.status].sort();
-      // One must be 201, the other 409 (or both 409 if first also lost the race, but never two 201s)
-      expect(statuses).to.not.deep.equal([201, 201], 'Two 201s for same email is not allowed');
-      // At least one must have succeeded or both hit duplicate — either [201,409] or [409,409]
-      statuses.forEach((s) => expect([201, 409]).to.include(s));
+      expect(statuses).to.deep.equal([201, 409]);
     });
   });
 
