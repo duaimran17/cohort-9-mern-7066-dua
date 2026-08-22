@@ -25,9 +25,14 @@ async function connect() {
     const uri = mongod.getUri();
     await mongoose.connect(uri);
   } catch (error) {
-    if (mongod) {
-      await mongod.stop();
-      mongod = null;
+    const server = mongod;
+    mongod = null;
+    if (server) {
+      try {
+        await server.stop();
+      } catch (cleanupError) {
+        // Preserve the original startup error — don't let cleanup failure mask it
+      }
     }
     throw error;
   }
@@ -49,15 +54,31 @@ async function clearDatabase() {
  * Call this in an `after()` hook at the end of each test suite.
  */
 async function disconnect() {
+  let firstError = null;
+
   try {
     await mongoose.connection.dropDatabase();
+  } catch (error) {
+    firstError = error;
+  }
+
+  try {
     await mongoose.connection.close();
-  } finally {
-    if (mongod) {
-      await mongod.stop();
-      mongod = null;
+  } catch (error) {
+    if (!firstError) firstError = error;
+  }
+
+  const server = mongod;
+  mongod = null;
+  if (server) {
+    try {
+      await server.stop();
+    } catch (error) {
+      if (!firstError) firstError = error;
     }
   }
+
+  if (firstError) throw firstError;
 }
 
 module.exports = { connect, clearDatabase, disconnect };
