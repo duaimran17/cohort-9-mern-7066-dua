@@ -39,6 +39,11 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
       setErrorMsg('Please enter your email address.');
       return;
     }
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
     if (!formData.password) {
       setErrorMsg('Please enter your password.');
       return;
@@ -68,18 +73,8 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
       }
     } catch (err) {
       if (err.response) {
-        const status = err.response.status;
-        const msg = err.response.data?.message;
-
-        if (status === 400) {
-          setErrorMsg(msg || 'All fields are required. Please check your inputs.');
-        } else if (status === 401) {
-          setErrorMsg(msg || 'Invalid email or password.');
-        } else if (status === 409) {
-          setErrorMsg(msg || 'An account with this email already exists.');
-        } else {
-          setErrorMsg(msg || `Server returned error (${status}).`);
-        }
+        // Read directly from the API's actual response and display as-is
+        setErrorMsg(err.response.data?.message || `Server returned error (${err.response.status}).`);
       } else if (err.request) {
         setErrorMsg('Unable to connect to the authentication server at http://localhost:5000');
       } else {
@@ -185,7 +180,7 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
                 className="auth-password-toggle"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
             </div>
           </div>
