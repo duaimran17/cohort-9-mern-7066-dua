@@ -39,7 +39,7 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
       setErrorMsg('Please enter your email address.');
       return;
     }
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email.trim())) {
       setErrorMsg('Please enter a valid email address.');
       return;
@@ -76,7 +76,7 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
         // Read directly from the API's actual response and display as-is
         setErrorMsg(err.response.data?.message || `Server returned error (${err.response.status}).`);
       } else if (err.request) {
-        setErrorMsg('Unable to connect to the authentication server at http://localhost:5000');
+        setErrorMsg('Unable to connect to the authentication server. Please check your network connection.');
       } else {
         setErrorMsg(err.message || 'An unexpected error occurred.');
       }
