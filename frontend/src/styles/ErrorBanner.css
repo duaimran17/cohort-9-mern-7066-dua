@@ -1,0 +1,72 @@
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 1rem;
+  background: rgba(80, 7, 24, 0.75);
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  color: #ffe4e6;
+  font-size: 0.875rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 15px rgba(244, 63, 94, 0.2);
+  animation: error-fade-in 0.3s ease-out;
+}
+
+.error-banner-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #fb7185;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.error-banner-content {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.error-banner-title {
+  font-weight: 600;
+  color: #fda4af;
+  margin-bottom: 0.125rem;
+  font-size: 0.8125rem;
+}
+
+.error-banner-message {
+  color: #ffe4e6;
+  font-size: 0.8125rem;
+  word-break: break-word;
+}
+
+.error-banner-close {
+  background: transparent;
+  border: none;
+  color: #fda4af;
+  cursor: pointer;
+  padding: 0.125rem;
+  font-size: 1rem;
+  line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-banner-close:hover {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+@keyframes error-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
