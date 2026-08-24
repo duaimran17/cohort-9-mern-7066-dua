@@ -1,6 +1,26 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Download, X, CheckSquare, Square, Search, CheckCircle2, FileText } from 'lucide-react';
+import { Download, X, CheckSquare, Square, Search } from 'lucide-react';
 
+/**
+ * @typedef {Object} Note
+ * @property {string} _id - Unique identifier for the note
+ * @property {string} title - Title of the note
+ * @property {string} content - HTML or text content of the note
+ * @property {string[]} [tags] - List of tag labels associated with the note
+ * @property {string} [createdAt] - Creation ISO date timestamp
+ * @property {string} [updatedAt] - Last updated ISO date timestamp
+ */
+
+/**
+ * ExportModal allows users to export all or custom selected notes as a JSON backup file.
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the export modal is open
+ * @param {Note[]} [props.notes=[]] - Array of notes available for export
+ * @param {Record<string, string[]>} [props.tagsMap={}] - Map of note IDs to their respective tags
+ * @param {(notesToExport: Note[]) => void} props.onExport - Callback invoked with selected notes to export
+ * @param {() => void} props.onCancel - Callback to close or cancel modal
+ * @returns {React.ReactNode}
+ */
 export default function ExportModal({
   isOpen,
   notes = [],
@@ -15,13 +35,15 @@ export default function ExportModal({
   // Reset or initialize selection when modal opens
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExportMode('all');
       setSelectedIds(new Set(notes.map((n) => n._id)));
       setSearchQuery('');
     }
-  }, [isOpen, notes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
-  // Keyboard accessibility
+  // Keyboard accessibility for escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -68,12 +90,9 @@ export default function ExportModal({
   };
 
   const handleConfirmExport = () => {
-    let notesToExport = [];
-    if (exportMode === 'all') {
-      notesToExport = notes;
-    } else {
-      notesToExport = notes.filter((n) => selectedIds.has(n._id));
-    }
+    const notesToExport = exportMode === 'all'
+      ? notes
+      : notes.filter((n) => selectedIds.has(n._id));
     onExport(notesToExport);
   };
 
@@ -123,14 +142,21 @@ export default function ExportModal({
         </div>
 
         {/* Export Mode Selection */}
-        <div className="export-options-group mb-4">
+        <div className="export-options-group mb-4" role="radiogroup" aria-label="Export mode selection">
           {/* Option 1: All Notes */}
           <label
-            className={`export-option-card ${exportMode === 'all' ? 'is-selected' : ''}`}
-            onClick={() => setExportMode('all')}
+            className={`export-option-card cursor-pointer ${exportMode === 'all' ? 'is-selected' : ''}`}
           >
+            <input
+              type="radio"
+              name="export-mode"
+              value="all"
+              checked={exportMode === 'all'}
+              onChange={() => setExportMode('all')}
+              className="sr-only"
+            />
             <div className="flex items-center gap-3">
-              <div className={`export-radio-circle ${exportMode === 'all' ? 'is-active' : ''}`}>
+              <div className={`export-radio-circle ${exportMode === 'all' ? 'is-active' : ''}`} aria-hidden="true">
                 {exportMode === 'all' && <div className="export-radio-inner" />}
               </div>
               <div>
@@ -144,11 +170,18 @@ export default function ExportModal({
 
           {/* Option 2: Custom Multi-Select */}
           <label
-            className={`export-option-card ${exportMode === 'custom' ? 'is-selected' : ''}`}
-            onClick={() => setExportMode('custom')}
+            className={`export-option-card cursor-pointer ${exportMode === 'custom' ? 'is-selected' : ''}`}
           >
+            <input
+              type="radio"
+              name="export-mode"
+              value="custom"
+              checked={exportMode === 'custom'}
+              onChange={() => setExportMode('custom')}
+              className="sr-only"
+            />
             <div className="flex items-center gap-3">
-              <div className={`export-radio-circle ${exportMode === 'custom' ? 'is-active' : ''}`}>
+              <div className={`export-radio-circle ${exportMode === 'custom' ? 'is-active' : ''}`} aria-hidden="true">
                 {exportMode === 'custom' && <div className="export-radio-inner" />}
               </div>
               <div>
@@ -206,8 +239,18 @@ export default function ExportModal({
                   return (
                     <div
                       key={note._id}
+                      role="checkbox"
+                      aria-checked={isChecked}
+                      tabIndex={0}
                       onClick={() => toggleSelectNote(note._id)}
-                      className={`export-note-row ${isChecked ? 'is-checked' : ''}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleSelectNote(note._id);
+                        }
+                      }}
+                      className={`export-note-row cursor-pointer ${isChecked ? 'is-checked' : ''}`}
+                      aria-label={`Select ${note.title}`}
                     >
                       <div className="export-checkbox-box shrink-0">
                         {isChecked ? (

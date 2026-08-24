@@ -50,7 +50,9 @@ export const fetchNoteById = async (id, token) => {
 
 /**
  * Create a new note
- * @param {{ title: string, content: string }} noteData
+ * Note: Tags are handled on the frontend via localStorage and are not sent to or persisted by the backend API.
+ * As a result, tags are local to the current browser/device.
+ * @param {{ title: string, content: string, tags?: string[] }} noteData
  * @param {string} [token]
  * @returns {Promise<{ _id: string, title: string, content: string, owner: string, createdAt: string, updatedAt: string }>}
  */
@@ -62,8 +64,10 @@ export const createNote = async ({ title, content }, token) => {
 
 /**
  * Update an existing note
+ * Note: Tags are handled on the frontend via localStorage and are not sent to or persisted by the backend API.
+ * As a result, tags are local to the current browser/device.
  * @param {string} id
- * @param {{ title?: string, content?: string }} noteData
+ * @param {{ title?: string, content?: string, tags?: string[] }} noteData
  * @param {string} [token]
  * @returns {Promise<{ _id: string, title: string, content: string, owner: string, createdAt: string, updatedAt: string }>}
  */

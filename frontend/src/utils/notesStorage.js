@@ -14,17 +14,20 @@ export const loadTagsMap = (userId) => {
   try {
     const userKey = getTagsKey(userId);
     const rawUser = localStorage.getItem(userKey);
+    if (rawUser) {
+      return JSON.parse(rawUser) || {};
+    }
+
+    // One-time legacy migration read: fallback to global/old keys if user-scoped key doesn't exist
     const rawGlobal = localStorage.getItem('shine_note_tags');
     const rawLegacy = localStorage.getItem(`shine_notes_tags_${userId || 'guest'}`);
 
-    const parsedUser = rawUser ? JSON.parse(rawUser) : {};
     const parsedGlobal = rawGlobal ? JSON.parse(rawGlobal) : {};
     const parsedLegacy = rawLegacy ? JSON.parse(rawLegacy) : {};
 
     return {
       ...parsedLegacy,
       ...parsedGlobal,
-      ...parsedUser,
     };
   } catch {
     return {};
@@ -47,11 +50,10 @@ export const saveNoteTags = (noteId, tags, userId) => {
 
     current[noteId] = cleanTags;
 
-    // Save to user key as well as global key
+    // Save only to user-scoped key
     const userKey = getTagsKey(userId);
     const serialized = JSON.stringify(current);
     localStorage.setItem(userKey, serialized);
-    localStorage.setItem('shine_note_tags', serialized);
   } catch (err) {
     console.warn('Failed to save tags to localStorage', err);
   }
@@ -70,7 +72,6 @@ export const removeNoteTags = (noteId, userId) => {
 
     const serialized = JSON.stringify(current);
     localStorage.setItem(getTagsKey(userId), serialized);
-    localStorage.setItem('shine_note_tags', serialized);
   } catch (err) {
     console.warn('Failed to remove tags', err);
   }
@@ -89,10 +90,13 @@ export const loadTrashNotes = (userId) => {
     if (!Array.isArray(trashed)) return [];
 
     const now = Date.now();
-    // Filter out notes soft-deleted more than 7 days ago
+    // Filter out notes soft-deleted more than 7 days ago (keep missing/invalid deletedAt as fresh)
     const activeTrash = trashed.filter((item) => {
-      if (!item.deletedAt) return false;
-      const age = now - new Date(item.deletedAt).getTime();
+      if (!item) return false;
+      if (!item.deletedAt) return true;
+      const deletedTime = new Date(item.deletedAt).getTime();
+      if (isNaN(deletedTime)) return true;
+      const age = now - deletedTime;
       return age < SEVEN_DAYS_MS;
     });
 
@@ -169,7 +173,9 @@ export const emptyTrashStorage = (userId) => {
  */
 export const getRetentionTimeLeft = (deletedAt) => {
   if (!deletedAt) return '7 days left';
-  const age = Date.now() - new Date(deletedAt).getTime();
+  const deletedTime = new Date(deletedAt).getTime();
+  if (isNaN(deletedTime)) return '7 days left';
+  const age = Date.now() - deletedTime;
   const remainingMs = SEVEN_DAYS_MS - age;
   if (remainingMs <= 0) return 'Expiring now';
 
@@ -201,16 +207,17 @@ export const exportNotesToJson = (notes, tagsMap = {}) => {
     })),
   };
 
-  const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-    JSON.stringify(exportData, null, 2)
-  )}`;
+  const jsonString = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const objectUrl = URL.createObjectURL(blob);
   const dateStr = new Date().toISOString().split('T')[0];
   const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute('href', jsonString);
+  downloadAnchor.setAttribute('href', objectUrl);
   downloadAnchor.setAttribute('download', `shine-notes-export-${dateStr}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
+  URL.revokeObjectURL(objectUrl);
 };
 
 /**

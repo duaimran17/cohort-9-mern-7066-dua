@@ -1,6 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Trash2, X, Loader2, AlertTriangle } from 'lucide-react';
 
+/**
+ * @typedef {Object} Note
+ * @property {string} _id - Unique identifier for the note
+ * @property {string} title - Title of the note
+ * @property {string} [content] - HTML or text content of the note
+ * @property {string[]} [tags] - List of tag labels associated with the note
+ */
+
+/**
+ * Confirmation modal for moving notes to trash, permanent single deletion, or emptying trash.
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the confirmation modal dialog is visible
+ * @param {Note|null} [props.note] - Target note to be deleted (for single note operations)
+ * @param {'trash' | 'permanent' | 'empty-trash'} [props.mode='trash'] - Delete operation mode
+ * @param {() => void | Promise<void>} props.onConfirm - Callback triggered when user confirms delete action
+ * @param {() => void} props.onCancel - Callback triggered when user cancels or closes modal
+ * @param {boolean} [props.isDeleting=false] - Whether deletion request is currently processing
+ * @returns {React.ReactNode}
+ */
 export default function DeleteConfirmModal({
   isOpen,
   note,
@@ -9,6 +28,34 @@ export default function DeleteConfirmModal({
   onCancel,
   isDeleting,
 }) {
+  const cancelBtnRef = useRef(null);
+  const triggerElementRef = useRef(null);
+
+  // Focus management: capture active trigger element and focus into dialog on open, restore on close
+  useEffect(() => {
+    if (isOpen) {
+      triggerElementRef.current = document.activeElement;
+      // Focus cancel button once modal renders
+      const timer = setTimeout(() => {
+        cancelBtnRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(timer);
+    } else if (triggerElementRef.current) {
+      triggerElementRef.current.focus?.();
+      triggerElementRef.current = null;
+    }
+  }, [isOpen]);
+
+  // Clean up focus restoration on unmount
+  useEffect(() => {
+    return () => {
+      if (triggerElementRef.current) {
+        triggerElementRef.current.focus?.();
+      }
+    };
+  }, []);
+
+  // Escape key listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && !isDeleting) {
@@ -96,6 +143,7 @@ export default function DeleteConfirmModal({
         {/* Modal Actions */}
         <div className="flex items-center justify-end gap-3">
           <button
+            ref={cancelBtnRef}
             type="button"
             onClick={onCancel}
             disabled={isDeleting}

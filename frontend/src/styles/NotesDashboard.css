@@ -3,12 +3,15 @@
 .notes-workspace {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
   width: 100%;
   position: relative;
   z-index: 2;
   color: #f3f4f6;
-  overflow: hidden; /* Strict: prevent entire page body from scrolling */
+  overflow: hidden;
+  /* Strict: prevent entire page body from scrolling */
 }
 
 /* ==========================================================================
@@ -18,7 +21,9 @@
 .notes-sidebar {
   width: 280px;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
   position: sticky;
   top: 0;
   flex-shrink: 0;
@@ -69,7 +74,7 @@
 }
 
 .brand-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.02em;
@@ -334,8 +339,11 @@
   flex-direction: column;
   min-width: 0;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
-  overflow-y: auto; /* Exclusively scroll vertically on right-side main area */
+  max-height: 100dvh;
+  overflow-y: auto;
+  /* Exclusively scroll vertically on right-side main area */
   position: relative;
 }
 
@@ -513,7 +521,7 @@
 }
 
 .welcome-heading {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
   color: #ffffff;
@@ -589,7 +597,7 @@
 }
 
 .notes-section-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
@@ -730,7 +738,7 @@
 }
 
 .note-card-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   color: #ffffff;
@@ -815,7 +823,7 @@
 }
 
 .note-card-html-preview h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1rem;
   font-weight: 700;
   color: #ffffff;
@@ -823,7 +831,7 @@
 }
 
 .note-card-html-preview h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 0.925rem;
   font-weight: 700;
   color: #f3e8ff;
@@ -944,9 +952,12 @@
 }
 
 @keyframes pulse-skeleton {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 0.85;
   }
@@ -984,7 +995,7 @@
 }
 
 .empty-state-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
@@ -1014,7 +1025,7 @@
 }
 
 .md-h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
@@ -1031,7 +1042,7 @@
 }
 
 .md-h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   color: #f3e8ff;
@@ -1180,7 +1191,7 @@
   justify-content: center;
   padding: 1.5rem;
   z-index: 50;
-  animation: fadeIn 0.2s ease-out;
+  animation: fade-in 0.2s ease-out;
 }
 
 .note-editor-modal {
@@ -1195,7 +1206,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modal-scale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .note-editor-top-glow {
@@ -1216,7 +1227,7 @@
 }
 
 .note-editor-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: #ffffff;
@@ -1482,7 +1493,7 @@
 
 .note-editor-wysiwyg h1,
 [contenteditable="true"] h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff !important;
@@ -1494,7 +1505,7 @@
 
 .note-editor-wysiwyg h2,
 [contenteditable="true"] h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   color: #f3e8ff !important;
@@ -1621,7 +1632,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(139, 92, 246, 0.25);
-  animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modal-scale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .export-modal-top-glow {
@@ -1841,20 +1852,26 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(244, 63, 94, 0.2);
-  animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modal-scale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Keyframe animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes modalScale {
+@keyframes modal-scale {
   from {
     opacity: 0;
     transform: scale(0.95) translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -1870,9 +1887,11 @@
   .notes-sidebar {
     width: 240px;
   }
+
   .notes-dashboard-content {
     padding: 1.5rem;
   }
+
   .notes-grid {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.25rem;
@@ -1892,6 +1911,7 @@
     left: 0;
     width: 280px;
     height: 100vh;
+    height: 100dvh;
     transform: translateX(-100%);
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     z-index: 40;

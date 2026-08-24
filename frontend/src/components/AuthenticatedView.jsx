@@ -83,6 +83,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
   // Initialize tags and trash on mount / user change
   useEffect(() => {
     if (user?._id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTagsMap(loadTagsMap(user._id));
       setTrashNotes(loadTrashNotes(user._id));
     }
@@ -104,6 +105,14 @@ export default function AuthenticatedView({ user, token, onLogout }) {
     }
   }, [token, onLogout]);
 
+  // Keep a ref to handleLogout to prevent loadNotes from re-running on callback identity changes
+  const handleLogoutRef = useRef(handleLogout);
+  useEffect(() => {
+    handleLogoutRef.current = handleLogout;
+  }, [handleLogout]);
+
+  const userId = user?._id;
+
   // Fetch notes from server and merge persistent localStorage tags
   const loadNotes = useCallback(async () => {
     setIsLoading(true);
@@ -112,11 +121,11 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       const data = await fetchNotes(token);
       const fetchedNotes = Array.isArray(data) ? data : [];
       
-      const currentTrash = loadTrashNotes(user?._id);
+      const currentTrash = loadTrashNotes(userId);
       setTrashNotes(currentTrash);
       const trashIds = new Set(currentTrash.map((t) => t._id));
 
-      const savedTags = loadTagsMap(user?._id);
+      const savedTags = loadTagsMap(userId);
       setTagsMap(savedTags);
 
       const activeOnly = fetchedNotes
@@ -134,60 +143,25 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       setApiError(errorMsg);
       if (err.response?.status === 401) {
         setTimeout(() => {
-          handleLogout();
+          handleLogoutRef.current?.();
         }, 1800);
       }
     } finally {
       setIsLoading(false);
     }
-  }, [token, user, handleLogout]);
+  }, [token, userId]);
 
   // Initial load
   useEffect(() => {
     let isMounted = true;
-    (async () => {
-      try {
-        const data = await fetchNotes(token);
-        if (isMounted) {
-          const fetchedNotes = Array.isArray(data) ? data : [];
-          const currentTrash = loadTrashNotes(user?._id);
-          setTrashNotes(currentTrash);
-          const trashIds = new Set(currentTrash.map((t) => t._id));
-
-          const savedTags = loadTagsMap(user?._id);
-          setTagsMap(savedTags);
-
-          const activeOnly = fetchedNotes
-            .filter((n) => !trashIds.has(n._id))
-            .map((note) => ({
-              ...note,
-              tags: (Array.isArray(note.tags) && note.tags.length > 0)
-                ? note.tags
-                : (savedTags[note._id] || []),
-            }));
-
-          setNotes(activeOnly);
-        }
-      } catch (err) {
-        if (isMounted) {
-          const errorMsg = extractApiErrorMessage(err);
-          setApiError(errorMsg);
-          if (err.response?.status === 401) {
-            setTimeout(() => {
-              handleLogout();
-            }, 1800);
-          }
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    })();
+    if (isMounted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadNotes();
+    }
     return () => {
       isMounted = false;
     };
-  }, [token, user, handleLogout]);
+  }, [loadNotes]);
 
   // Compute all unique tags across active notes
   const allUniqueTags = useMemo(() => {
@@ -309,33 +283,73 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       } else if (deleteMode === 'permanent') {
         // Permanent delete single note
         if (!noteToDelete?._id) return;
+        let serverSuccess = false;
         try {
           await deleteNote(noteToDelete._id, token);
-        } catch {
-          // Continue to clear client storage if already removed on server
+          serverSuccess = true;
+        } catch (err) {
+          if (err.response?.status === 404) {
+            serverSuccess = true;
+          } else {
+            const msg = extractApiErrorMessage(err);
+            setApiError(`Failed to delete "${noteToDelete.title}" on server: ${msg}`);
+          }
         }
-        const updatedTrash = removeFromTrash(noteToDelete._id, user?._id);
-        setTrashNotes(updatedTrash);
-        removeNoteTags(noteToDelete._id, user?._id);
-        setTagsMap((prev) => {
-          const copy = { ...prev };
-          delete copy[noteToDelete._id];
-          return copy;
-        });
-        setSuccessMessage(`Permanently deleted "${noteToDelete.title}".`);
+
+        if (serverSuccess) {
+          const updatedTrash = removeFromTrash(noteToDelete._id, user?._id);
+          setTrashNotes(updatedTrash);
+          removeNoteTags(noteToDelete._id, user?._id);
+          setTagsMap((prev) => {
+            const copy = { ...prev };
+            delete copy[noteToDelete._id];
+            return copy;
+          });
+          setSuccessMessage(`Permanently deleted "${noteToDelete.title}".`);
+        }
       } else if (deleteMode === 'empty-trash') {
         // Permanently delete all trash notes
+        let failedCount = 0;
+        let successCount = 0;
+        const remainingTrash = [];
+
         for (const item of trashNotes) {
+          let itemSuccess = false;
           try {
             await deleteNote(item._id, token);
-          } catch {
-            // ignore individual failures during batch clean
+            itemSuccess = true;
+          } catch (err) {
+            if (err.response?.status === 404) {
+              itemSuccess = true;
+            } else {
+              failedCount++;
+              remainingTrash.push(item);
+            }
           }
-          removeNoteTags(item._id, user?._id);
+
+          if (itemSuccess) {
+            successCount++;
+            removeFromTrash(item._id, user?._id);
+            removeNoteTags(item._id, user?._id);
+            setTagsMap((prev) => {
+              const copy = { ...prev };
+              delete copy[item._id];
+              return copy;
+            });
+          }
         }
-        emptyTrashStorage(user?._id);
-        setTrashNotes([]);
-        setSuccessMessage('Trash emptied successfully.');
+
+        setTrashNotes(remainingTrash);
+
+        if (failedCount === 0) {
+          emptyTrashStorage(user?._id);
+          setSuccessMessage('Trash emptied successfully.');
+        } else if (successCount > 0) {
+          setSuccessMessage(`Emptied ${successCount} ${successCount === 1 ? 'note' : 'notes'}.`);
+          setApiError(`Failed to delete ${failedCount} ${failedCount === 1 ? 'note' : 'notes'} from server.`);
+        } else {
+          setApiError(`Failed to empty trash on server (${failedCount} ${failedCount === 1 ? 'note' : 'notes'} failed).`);
+        }
       }
       setIsDeleteOpen(false);
       setNoteToDelete(null);
@@ -392,6 +406,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
     try {
       const parsedNotes = await parseImportFile(file);
       let importedCount = 0;
+      let failedCount = 0;
 
       for (const item of parsedNotes) {
         try {
@@ -406,11 +421,24 @@ export default function AuthenticatedView({ user, token, onLogout }) {
           setNotes((prev) => [{ ...created, tags: item.tags || [] }, ...prev]);
           importedCount++;
         } catch (err) {
+          failedCount++;
           console.warn('Failed to import individual note:', item.title, err);
         }
       }
 
-      setSuccessMessage(`Successfully imported ${importedCount} ${importedCount === 1 ? 'note' : 'notes'}!`);
+      if (importedCount === 0) {
+        setApiError(
+          `Failed to import notes${failedCount > 0 ? ` (${failedCount} failed)` : ''}.`
+        );
+      } else if (failedCount > 0) {
+        setSuccessMessage(
+          `Imported ${importedCount} ${importedCount === 1 ? 'note' : 'notes'} (${failedCount} failed).`
+        );
+      } else {
+        setSuccessMessage(
+          `Successfully imported ${importedCount} ${importedCount === 1 ? 'note' : 'notes'}!`
+        );
+      }
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err) {
       setApiError(err.message || 'Failed to import notes file.');
@@ -627,10 +655,10 @@ export default function AuthenticatedView({ user, token, onLogout }) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search notes by title, content, or tag..."
+                  placeholder="Search notes by title or tag..."
                   className="notes-search-input"
                   id="notes-search-input"
-                  aria-label="Search notes by title, content, or tag"
+                  aria-label="Search notes by title or tag"
                 />
                 {searchQuery && (
                   <button

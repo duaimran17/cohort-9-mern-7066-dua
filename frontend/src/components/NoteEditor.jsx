@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import {
   X,
   Save,
@@ -46,6 +47,7 @@ function NoteEditorForm({
   // Synchronize initial tags
   useEffect(() => {
     if (initialNote?.tags && initialNote.tags.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTags(initialNote.tags);
     } else if (initialTags && initialTags.length > 0) {
       setTags(initialTags);
@@ -82,7 +84,7 @@ function NoteEditorForm({
         ol: isOl,
       });
     } catch {
-
+      // Ignore formatting state errors
     }
   }, []);
 
@@ -95,7 +97,7 @@ function NoteEditorForm({
     }
     if (editorRef.current) {
       const rawContent = initialNote?.content || '';
-      editorRef.current.innerHTML = rawContent;
+      editorRef.current.innerHTML = DOMPurify.sanitize(rawContent);
       updateCounts();
     }
   }, [initialNote, updateCounts]);

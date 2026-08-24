@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { Edit3, Trash2, Clock, RotateCcw, Tag as TagIcon, AlertCircle } from 'lucide-react';
 import { getRetentionTimeLeft } from '../utils/notesStorage';
 
@@ -60,39 +61,39 @@ export default function NoteCard({
   const noteTags = note.tags || tags || [];
   const formattedDate = formatDate(note.updatedAt || note.createdAt);
   const retentionTime = isTrashMode ? getRetentionTimeLeft(note.deletedAt) : null;
-  const htmlContent = renderNoteHtml(note.content);
+  const rawHtml = renderNoteHtml(note.content);
+  const sanitizedHtml = DOMPurify.sanitize(rawHtml);
 
   const handleCardClick = (e) => {
-    // If user clicked directly on action buttons, tags, or links, do not trigger card edit
-    if (e.target.closest('button') || e.target.closest('a') || isTrashMode) {
-      return;
-    }
-    if (onEdit) {
-      onEdit(note);
-    }
+    if (isTrashMode) return;
+    if (e.target.closest('button, a, input, textarea')) return;
+    onEdit?.(note);
   };
 
   return (
     <article
       className={`note-card group ${isTrashMode ? 'is-trashed' : ''}`}
       onClick={handleCardClick}
-      role={isTrashMode ? 'article' : 'button'}
-      tabIndex={isTrashMode ? -1 : 0}
-      onKeyDown={(e) => {
-        if (!isTrashMode && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onEdit?.(note);
-        }
-      }}
-      aria-label={`${isTrashMode ? 'Trashed note' : 'Open note'}: ${note.title}`}
     >
       {/* Top Accent Gradient Border */}
       <div className={`note-card-top-accent ${isTrashMode ? 'accent-trash' : ''}`} />
 
       {/* Note Header */}
       <div className="note-card-header">
-        <h3 className="note-card-title" title={note.title}>
-          {note.title}
+        <h3 className="note-card-title">
+          {isTrashMode ? (
+            <span title={note.title}>{note.title}</span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onEdit?.(note)}
+              className="text-left bg-transparent border-0 p-0 text-inherit font-inherit cursor-pointer hover:text-purple-300 transition-colors w-full"
+              title={`Open note: ${note.title}`}
+              aria-label={`Open note: ${note.title}`}
+            >
+              {note.title}
+            </button>
+          )}
         </h3>
 
         <div className="note-card-actions">
@@ -164,7 +165,7 @@ export default function NoteCard({
       <div className="note-card-content">
         <div
           className="note-card-html-preview"
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
+          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
         />
       </div>
 

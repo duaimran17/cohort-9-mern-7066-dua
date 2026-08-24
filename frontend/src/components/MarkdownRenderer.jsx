@@ -1,20 +1,18 @@
-import React from 'react';
-
 /**
  * Parses inline markdown tokens: bold, italic, code, strikethrough
  * @param {string} text
  * @returns {React.ReactNode[]}
  */
-export function parseInlineMarkdown(text) {
+function parseInlineMarkdown(text) {
   if (!text) return [];
 
   // Match:
   // 1. Inline code: `...`
   // 2. Bold + Italic: ***...*** or ___...___
   // 3. Bold: **...** or __...__
-  // 4. Italic: *...* or _..._
+  // 4. Italic: *...* or _..._ (word-bounded)
   // 5. Strikethrough: ~~...~~
-  const tokenRegex = /(`[^`]+`|\*\*\*[^*]+\*\*\*|___[^_]+___|\*\*[^*]+\*\*|__[^_]+__|(?:\*|_)[^*_]+(?:\*|_)|~~[^~]+~~)/g;
+  const tokenRegex = /(`[^`]+`|\*\*\*[^*]+\*\*\*|___[^_]+___|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|\b_[^_]+_\b|~~[^~]+~~)/g;
 
   const parts = text.split(tokenRegex);
 
