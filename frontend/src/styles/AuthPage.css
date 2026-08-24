@@ -1,0 +1,242 @@
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  /* Soft, atmospheric gradient representing dusk sky rather than neon nightclub */
+  background: linear-gradient(135deg, #100a1c 0%, #1e132c 50%, #11142a 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 2rem 1.5rem;
+}
+
+/* Rich Twilight Ambient Glow Orbs & Background Layer */
+.ambient-glow-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  /* Layered soft radial blurs for nebulous, atmospheric textured feel */
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(99, 91, 122, 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 85% 80%, rgba(156, 124, 140, 0.2) 0%, transparent 65%),
+    radial-gradient(circle at 50% 50%, rgba(76, 73, 102, 0.25) 0%, transparent 70%);
+}
+
+/* Ambient glow orbs in corners - desaturated twilight colors */
+.ambient-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.ambient-glow-orb.top-left {
+  top: -15%;
+  left: -15%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, #5b537a 0%, transparent 70%);
+  animation: orb-drift 24s ease-in-out infinite alternate;
+}
+
+.ambient-glow-orb.bottom-right {
+  bottom: -20%;
+  right: -20%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, #8f7485 0%, transparent 70%);
+  animation: orb-drift-rev 28s ease-in-out infinite alternate;
+}
+
+.ambient-glow-orb.center-plum {
+  top: 35%;
+  left: 25%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #443c5e 0%, transparent 65%);
+  animation: pulse-plum 16s ease-in-out infinite;
+}
+
+/* Subtle Floating Mist Layers */
+.mist-layer {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 30% 40%, rgba(123, 107, 158, 0.04) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 60%, rgba(176, 142, 178, 0.03) 0%, transparent 60%);
+  filter: blur(50px);
+  animation: mist-float 35s ease-in-out infinite alternate;
+}
+
+/* Vector Wireframe Shapes Style */
+.vector-wireframe-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.wireframe-shape {
+  transform-origin: center;
+  transition: all 0.5s ease;
+}
+
+.wireframe-shape.float-slow {
+  animation: shape-float 20s ease-in-out infinite;
+}
+
+.wireframe-shape.float-medium {
+  animation: shape-float-medium 25s ease-in-out infinite;
+}
+
+.wireframe-shape.rotate-slow {
+  animation: shape-rotate 50s linear infinite;
+}
+
+/* Main Auth Stage */
+.auth-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-stage.is-centered {
+  justify-content: center;
+}
+
+.auth-stage.is-split {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+/* Section transitions */
+.welcome-section {
+  width: 100%;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-stage.is-split .welcome-section {
+  animation: slide-shift-left 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.auth-card-section {
+  width: 100%;
+  animation: slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animations */
+@keyframes orb-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(30px, 20px) scale(1.05);
+  }
+}
+
+@keyframes orb-drift-rev {
+  0% {
+    transform: translate(0, 0) scale(1.02);
+  }
+  100% {
+    transform: translate(-30px, -20px) scale(0.98);
+  }
+}
+
+@keyframes pulse-plum {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes mist-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-15px) scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes shape-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes shape-float-medium {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(10px, -5px) rotate(-4deg);
+  }
+}
+
+@keyframes shape-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slide-shift-left {
+  0% {
+    opacity: 0.9;
+    transform: translateX(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .auth-stage.is-split {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .auth-stage.is-split .welcome-section {
+    display: none; /* Focus cleanly on Auth Card on mobile when active */
+  }
+}
