@@ -1,34 +1,41 @@
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * Resolves a unique string identifier from a user object or userId string
+ * @param {any} userOrId
+ * @returns {string|null}
+ */
+const resolveUserId = (userOrId) => {
+  if (!userOrId) return null;
+  if (typeof userOrId === 'object') {
+    return userOrId._id || userOrId.id || userOrId.email || null;
+  }
+  return String(userOrId).trim() || null;
+};
+
 // Storage keys
-const getTagsKey = (userId) => (userId ? `shine_note_tags_${userId}` : 'shine_note_tags');
-const getTrashKey = (userId) => `shine_notes_trash_${userId || 'guest'}`;
+const getTagsKey = (userOrId) => {
+  const uid = resolveUserId(userOrId);
+  return uid ? `shine_tags_${uid}` : 'shine_tags_guest';
+};
+
+const getTrashKey = (userOrId) => {
+  const uid = resolveUserId(userOrId);
+  return uid ? `shine_trash_${uid}` : 'shine_trash_guest';
+};
 
 /**
- * Loads the tags map { [noteId]: string[] } for a user, checking both user-scoped and global keys
- * @param {string} [userId]
+ * Loads the tags map { [noteId]: string[] } for a user strictly from user-scoped key
+ * @param {string|object} [userId]
  * @returns {Record<string, string[]>}
  */
 export const loadTagsMap = (userId) => {
   try {
     const userKey = getTagsKey(userId);
     const rawUser = localStorage.getItem(userKey);
-    if (rawUser) {
-      return JSON.parse(rawUser) || {};
-    }
-
-    // One-time legacy migration read: fallback to global/old keys if user-scoped key doesn't exist
-    const rawGlobal = localStorage.getItem('shine_note_tags');
-    const rawLegacy = localStorage.getItem(`shine_notes_tags_${userId || 'guest'}`);
-
-    const parsedGlobal = rawGlobal ? JSON.parse(rawGlobal) : {};
-    const parsedLegacy = rawLegacy ? JSON.parse(rawLegacy) : {};
-
-    return {
-      ...parsedLegacy,
-      ...parsedGlobal,
-    };
+    if (!rawUser) return {};
+    return JSON.parse(rawUser) || {};
   } catch {
     return {};
   }
@@ -38,7 +45,7 @@ export const loadTagsMap = (userId) => {
  * Saves tags for a specific note to localStorage
  * @param {string} noteId
  * @param {string[]} tags
- * @param {string} [userId]
+ * @param {string|object} [userId]
  */
 export const saveNoteTags = (noteId, tags, userId) => {
   if (!noteId) return;
@@ -62,7 +69,7 @@ export const saveNoteTags = (noteId, tags, userId) => {
 /**
  * Removes tags for a deleted note
  * @param {string} noteId
- * @param {string} [userId]
+ * @param {string|object} [userId]
  */
 export const removeNoteTags = (noteId, userId) => {
   if (!noteId) return;
@@ -79,12 +86,13 @@ export const removeNoteTags = (noteId, userId) => {
 
 /**
  * Loads all trashed notes for a user, auto-purging items older than 7 days
- * @param {string} [userId]
+ * @param {string|object} [userId]
  * @returns {Array<any>}
  */
 export const loadTrashNotes = (userId) => {
   try {
-    const raw = localStorage.getItem(getTrashKey(userId));
+    const userKey = getTrashKey(userId);
+    const raw = localStorage.getItem(userKey);
     if (!raw) return [];
     const trashed = JSON.parse(raw);
     if (!Array.isArray(trashed)) return [];
@@ -102,7 +110,7 @@ export const loadTrashNotes = (userId) => {
 
     // If any items were purged, save the updated trash
     if (activeTrash.length !== trashed.length) {
-      localStorage.setItem(getTrashKey(userId), JSON.stringify(activeTrash));
+      localStorage.setItem(userKey, JSON.stringify(activeTrash));
     }
 
     return activeTrash;
@@ -115,7 +123,7 @@ export const loadTrashNotes = (userId) => {
  * Moves a note to trash with a deletedAt timestamp
  * @param {any} note
  * @param {string[]} [tags]
- * @param {string} [userId]
+ * @param {string|object} [userId]
  * @returns {Array<any>} updated trash list
  */
 export const moveNoteToTrash = (note, tags = [], userId) => {
@@ -140,7 +148,7 @@ export const moveNoteToTrash = (note, tags = [], userId) => {
 /**
  * Removes a note from trash (for Restore or Permanent Delete)
  * @param {string} noteId
- * @param {string} [userId]
+ * @param {string|object} [userId]
  * @returns {Array<any>} updated trash list
  */
 export const removeFromTrash = (noteId, userId) => {
@@ -156,7 +164,7 @@ export const removeFromTrash = (noteId, userId) => {
 
 /**
  * Empties all trashed notes
- * @param {string} [userId]
+ * @param {string|object} [userId]
  */
 export const emptyTrashStorage = (userId) => {
   try {

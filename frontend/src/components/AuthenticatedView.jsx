@@ -43,6 +43,8 @@ import {
 import '../styles/NotesDashboard.css';
 
 export default function AuthenticatedView({ user, token, onLogout }) {
+  const currentUserId = user?._id || user?.id || user?.email;
+
   // Active view: 'notes' | 'trash'
   const [currentView, setCurrentView] = useState('notes');
 
@@ -82,16 +84,27 @@ export default function AuthenticatedView({ user, token, onLogout }) {
 
   // Initialize tags and trash on mount / user change
   useEffect(() => {
-    if (user?._id) {
+    if (currentUserId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTagsMap(loadTagsMap(user._id));
-      setTrashNotes(loadTrashNotes(user._id));
+      setTagsMap(loadTagsMap(currentUserId));
+      setTrashNotes(loadTrashNotes(currentUserId));
+    } else {
+      setTagsMap({});
+      setTrashNotes([]);
     }
-  }, [user]);
+  }, [currentUserId]);
 
   // Logout handler
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
+    // Clear all in-memory React state for notes, trash, and tags
+    setNotes([]);
+    setTrashNotes([]);
+    setTagsMap({});
+    setSelectedTag(null);
+    setSearchQuery('');
+    setActiveNote(null);
+    setNoteToDelete(null);
     try {
       if (token) {
         await logoutUser(token);
@@ -111,8 +124,6 @@ export default function AuthenticatedView({ user, token, onLogout }) {
     handleLogoutRef.current = handleLogout;
   }, [handleLogout]);
 
-  const userId = user?._id;
-
   // Fetch notes from server and merge persistent localStorage tags
   const loadNotes = useCallback(async () => {
     setIsLoading(true);
@@ -121,11 +132,11 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       const data = await fetchNotes(token);
       const fetchedNotes = Array.isArray(data) ? data : [];
       
-      const currentTrash = loadTrashNotes(userId);
+      const currentTrash = loadTrashNotes(currentUserId);
       setTrashNotes(currentTrash);
       const trashIds = new Set(currentTrash.map((t) => t._id));
 
-      const savedTags = loadTagsMap(userId);
+      const savedTags = loadTagsMap(currentUserId);
       setTagsMap(savedTags);
 
       const activeOnly = fetchedNotes
@@ -149,7 +160,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
     } finally {
       setIsLoading(false);
     }
-  }, [token, userId]);
+  }, [token, currentUserId]);
 
   // Initial load
   useEffect(() => {
@@ -211,7 +222,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       if (activeNote && activeNote._id) {
         // Update existing note
         const updated = await updateNote(activeNote._id, { title, content, tags }, token);
-        saveNoteTags(updated._id, tags, user?._id);
+        saveNoteTags(updated._id, tags, currentUserId);
         
         setTagsMap((prev) => ({ ...prev, [updated._id]: tags }));
         setNotes((prevNotes) =>
@@ -222,7 +233,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
       } else {
         // Create new note
         const created = await createNote({ title, content, tags }, token);
-        saveNoteTags(created._id, tags, user?._id);
+        saveNoteTags(created._id, tags, currentUserId);
 
         setTagsMap((prev) => ({ ...prev, [created._id]: tags }));
         setNotes((prevNotes) => [{ ...created, tags }, ...prevNotes]);
@@ -276,7 +287,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
         // Soft delete: move to trash
         if (!noteToDelete?._id) return;
         const currentNoteTags = noteToDelete.tags || tagsMap[noteToDelete._id] || [];
-        const updatedTrash = moveNoteToTrash(noteToDelete, currentNoteTags, user?._id);
+        const updatedTrash = moveNoteToTrash(noteToDelete, currentNoteTags, currentUserId);
         setTrashNotes(updatedTrash);
         setNotes((prev) => prev.filter((n) => n._id !== noteToDelete._id));
         setSuccessMessage(`Moved "${noteToDelete.title}" to Trash.`);
@@ -297,9 +308,9 @@ export default function AuthenticatedView({ user, token, onLogout }) {
         }
 
         if (serverSuccess) {
-          const updatedTrash = removeFromTrash(noteToDelete._id, user?._id);
+          const updatedTrash = removeFromTrash(noteToDelete._id, currentUserId);
           setTrashNotes(updatedTrash);
-          removeNoteTags(noteToDelete._id, user?._id);
+          removeNoteTags(noteToDelete._id, currentUserId);
           setTagsMap((prev) => {
             const copy = { ...prev };
             delete copy[noteToDelete._id];
@@ -329,8 +340,8 @@ export default function AuthenticatedView({ user, token, onLogout }) {
 
           if (itemSuccess) {
             successCount++;
-            removeFromTrash(item._id, user?._id);
-            removeNoteTags(item._id, user?._id);
+            removeFromTrash(item._id, currentUserId);
+            removeNoteTags(item._id, currentUserId);
             setTagsMap((prev) => {
               const copy = { ...prev };
               delete copy[item._id];
@@ -342,7 +353,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
         setTrashNotes(remainingTrash);
 
         if (failedCount === 0) {
-          emptyTrashStorage(user?._id);
+          emptyTrashStorage(currentUserId);
           setSuccessMessage('Trash emptied successfully.');
         } else if (successCount > 0) {
           setSuccessMessage(`Emptied ${successCount} ${successCount === 1 ? 'note' : 'notes'}.`);
@@ -366,7 +377,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
 
   // Restore note from trash
   const handleRestoreNote = (note) => {
-    const updatedTrash = removeFromTrash(note._id, user?._id);
+    const updatedTrash = removeFromTrash(note._id, currentUserId);
     setTrashNotes(updatedTrash);
     const restoredTags = note.tags || tagsMap[note._id] || [];
     setNotes((prev) => [{ ...note, tags: restoredTags }, ...prev]);
@@ -415,7 +426,7 @@ export default function AuthenticatedView({ user, token, onLogout }) {
             token
           );
           if (item.tags && item.tags.length > 0) {
-            saveNoteTags(created._id, item.tags, user?._id);
+            saveNoteTags(created._id, item.tags, currentUserId);
             setTagsMap((prev) => ({ ...prev, [created._id]: item.tags }));
           }
           setNotes((prev) => [{ ...created, tags: item.tags || [] }, ...prev]);

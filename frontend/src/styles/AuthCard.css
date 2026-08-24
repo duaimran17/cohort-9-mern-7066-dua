@@ -227,6 +227,70 @@
   color: #fbcfe8;
 }
 
+/* Success Banner */
+.auth-success-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 1rem;
+  background: rgba(6, 78, 59, 0.75);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #d1fae5;
+  font-size: 0.875rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 15px rgba(52, 211, 153, 0.2);
+  animation: error-fade-in 0.3s ease-out;
+}
+
+.auth-success-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #34d399;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.auth-success-content {
+  flex: 1;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.auth-success-title {
+  font-weight: 600;
+  color: #6ee7b7;
+  margin-bottom: 0.125rem;
+  font-size: 0.8125rem;
+}
+
+.auth-success-message {
+  color: #d1fae5;
+  font-size: 0.8125rem;
+  word-break: break-word;
+}
+
+.auth-success-close {
+  background: transparent;
+  border: none;
+  color: #6ee7b7;
+  cursor: pointer;
+  padding: 0.125rem;
+  font-size: 1rem;
+  line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-success-close:hover {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
