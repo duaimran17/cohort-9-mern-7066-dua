@@ -9,9 +9,15 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  overflow-x: hidden;
   box-sizing: border-box;
   padding: 2rem 1.5rem;
+}
+
+.auth-page.is-workspace-mode {
+  padding: 0;
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
 /* Rich Twilight Ambient Glow Orbs & Background Layer */

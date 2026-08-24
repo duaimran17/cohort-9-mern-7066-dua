@@ -1,5 +1,10 @@
 import AuthPage from './pages/AuthPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
-  return <AuthPage />;
+  return (
+    <ErrorBoundary>
+      <AuthPage />
+    </ErrorBoundary>
+  );
 }
