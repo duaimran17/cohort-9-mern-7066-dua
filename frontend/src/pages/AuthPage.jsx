@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import WelcomeHero from '../components/WelcomeHero';
 import AuthCard from '../components/AuthCard';
 import AuthenticatedView from '../components/AuthenticatedView';
@@ -7,18 +7,14 @@ import '../styles/AuthPage.css';
 
 export default function AuthPage() {
   const [showAuth, setShowAuth] = useState(false);
-  const [authState, setAuthState] = useState({
-    token: null,
-    user: null,
-    isAuthenticated: false,
-  });
-
-  useEffect(() => {
+  const [authState, setAuthState] = useState(() => {
     const { token, user } = getAuthData();
-    if (token && user) {
-      setAuthState({ token, user, isAuthenticated: true });
-    }
-  }, []);
+    return {
+      token,
+      user,
+      isAuthenticated: Boolean(token && user),
+    };
+  });
 
   const handleGetStarted = () => {
     setShowAuth(true);
@@ -47,7 +43,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page ${authState.isAuthenticated ? 'is-workspace-mode' : ''}`}>
       {/* Ambient Twilight Vector Background */}
       <div className="ambient-glow-layer" aria-hidden="true">
         {/* Glow Orbs */}
@@ -112,13 +108,11 @@ export default function AuthPage() {
 
       {/* Main Authentication Stage */}
       {authState.isAuthenticated ? (
-        <div className="auth-stage is-centered">
-          <AuthenticatedView
-            user={authState.user}
-            token={authState.token}
-            onLogout={handleLogout}
-          />
-        </div>
+        <AuthenticatedView
+          user={authState.user}
+          token={authState.token}
+          onLogout={handleLogout}
+        />
       ) : (
         <div className={`auth-stage ${showAuth ? 'is-split' : 'is-centered'}`}>
           <div className="welcome-section">

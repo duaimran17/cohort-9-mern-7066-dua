@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, CheckCircle2, X } from 'lucide-react';
 import ErrorBanner from './ErrorBanner';
 import { signupUser, loginUser, saveAuthData } from '../api/authApi';
 import '../styles/AuthCard.css';
@@ -14,21 +14,28 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'signin' ? 'signup' : 'signin'));
+    // Reset ALL form fields so values from one mode never bleed into the other
+    setFormData({ name: '', email: '', password: '' });
+    setShowPassword(false);
     setErrorMsg(null);
+    setSuccessMsg(null);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errorMsg) setErrorMsg(null);
+    if (successMsg) setSuccessMsg(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg(null);
+    setSuccessMsg(null);
 
     // Client-side quick checks
     if (mode === 'signup' && !formData.name.trim()) {
@@ -56,13 +63,18 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
     setIsLoading(true);
     try {
       if (mode === 'signup') {
-        const data = await signupUser({
+        await signupUser({
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
         });
-        saveAuthData(data.token, data.user);
-        if (onAuthSuccess) onAuthSuccess(data);
+        // Strict sign-up flow: DO NOT auto-login or store tokens on sign-up
+        setSuccessMsg('Account created successfully! Please sign in.');
+        setMode('signin');
+        setFormData((prev) => ({
+          ...prev,
+          password: '',
+        }));
       } else {
         const data = await loginUser({
           email: formData.email.trim(),
@@ -74,7 +86,13 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
     } catch (err) {
       if (err.response) {
         // Read directly from the API's actual response and display as-is
-        setErrorMsg(err.response.data?.message || `Server returned error (${err.response.status}).`);
+        const resData = err.response.data;
+        const msg =
+          (typeof resData === 'string'
+            ? resData
+            : resData?.message || resData?.error) ||
+          `Server returned error (${err.response.status}).`;
+        setErrorMsg(msg);
       } else if (err.request) {
         setErrorMsg('Unable to connect to the authentication server. Please check your network connection.');
       } else {
@@ -115,6 +133,25 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
 
         {/* Error Banner */}
         <ErrorBanner message={errorMsg} onClose={() => setErrorMsg(null)} />
+
+        {/* Success Banner */}
+        {successMsg && (
+          <div role="status" className="auth-success-banner" id="auth-success-banner">
+            <CheckCircle2 className="auth-success-icon" />
+            <div className="auth-success-content">
+              <div className="auth-success-title">Success</div>
+              <div className="auth-success-message">{successMsg}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSuccessMsg(null)}
+              className="auth-success-close"
+              aria-label="Close success banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
