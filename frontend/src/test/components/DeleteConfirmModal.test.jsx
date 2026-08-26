@@ -2,8 +2,6 @@
 import userEvent from '@testing-library/user-event';
 import DeleteConfirmModal from '../../components/DeleteConfirmModal';
 
-
-
 const FAKE_NOTE = { _id: 'n1', title: 'My Important Note' };
 
 const BASE_PROPS = {
@@ -23,7 +21,6 @@ function renderModal(overrides = {}) {
 }
 
 // Tests
-
 
 describe('DeleteConfirmModal — visibility', () => {
   it('renders nothing when isOpen is false', () => {
@@ -102,29 +99,41 @@ describe('DeleteConfirmModal — empty-trash mode', () => {
 
 describe('DeleteConfirmModal — confirm action', () => {
   it('calls onConfirm when the confirm button is clicked', async () => {
-    const onConfirm = jest.fn();
-    const { user } = renderModal({ onConfirm });
-    await user.click(screen.getByRole('button', { name: /move to trash/i }));
-    expect(onConfirm).toHaveBeenCalledTimes(1);
+    try {
+      const onConfirm = jest.fn();
+      const { user } = renderModal({ onConfirm });
+      await user.click(screen.getByRole('button', { name: /move to trash/i }));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+    } catch (error) {
+      throw new Error(`Failed asserting confirm button click in DeleteConfirmModal: ${error.message}`);
+    }
   });
 });
 
 describe('DeleteConfirmModal — cancel paths', () => {
   it('calls onCancel when the Cancel button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderModal({ onCancel });
-    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderModal({ onCancel });
+      await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting Cancel button click in DeleteConfirmModal: ${error.message}`);
+    }
   });
 
   it('calls onCancel when the close (×) icon button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderModal({ onCancel });
-    await user.click(screen.getByRole('button', { name: /close dialog/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderModal({ onCancel });
+      await user.click(screen.getByRole('button', { name: /close dialog/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting close icon button click in DeleteConfirmModal: ${error.message}`);
+    }
   });
 
-  it('calls onCancel when the Escape key is pressed', async () => {
+  it('calls onCancel when the Escape key is pressed', () => {
     const onCancel = jest.fn();
     renderModal({ onCancel });
     fireEvent.keyDown(window, { key: 'Escape' });

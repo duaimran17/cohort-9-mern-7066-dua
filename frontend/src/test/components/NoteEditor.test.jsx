@@ -1,7 +1,6 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+﻿import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NoteEditor from '../../components/NoteEditor';
-
 
 // Module mocks
 
@@ -14,9 +13,7 @@ jest.mock('../../components/ErrorBanner', () =>
   }
 );
 
-
 // Shared helpers
-
 
 const BASE_PROPS = {
   isOpen: true,
@@ -28,14 +25,12 @@ const BASE_PROPS = {
   externalError: null,
 };
 
-
 function renderEditor(overrides = {}) {
   const props = { ...BASE_PROPS, ...overrides };
   const user = userEvent.setup();
   render(<NoteEditor {...props} />);
   return { user, props };
 }
-
 
 function setCanvasContent(canvas, content) {
   Object.defineProperty(canvas, 'innerText', {
@@ -122,112 +117,142 @@ describe('NoteEditor — edit mode UI', () => {
 });
 
 describe('NoteEditor — validation', () => {
-
-  beforeEach(() => {
-
-  });
-
   it('shows an error alert when title is empty on submit', async () => {
-    const { user } = renderEditor();
-    const canvas = screen.getByRole('textbox', { name: /note content/i });
-    setCanvasContent(canvas, '');
-    await user.click(screen.getByRole('button', { name: /save note/i }));
-    expect(screen.getByRole('alert')).toHaveTextContent(/enter a note title/i);
+    try {
+      const { user } = renderEditor();
+      const canvas = screen.getByRole('textbox', { name: /note content/i });
+      setCanvasContent(canvas, '');
+      await user.click(screen.getByRole('button', { name: /save note/i }));
+      expect(screen.getByRole('alert')).toHaveTextContent(/enter a note title/i);
+    } catch (error) {
+      throw new Error(`Failed asserting title-empty validation in NoteEditor: ${error.message}`);
+    }
   });
 
   it('shows an error alert when content is empty on submit', async () => {
-    const { user } = renderEditor();
-    await user.type(screen.getByLabelText(/^note title$/i), 'My Title');
+    try {
+      const { user } = renderEditor();
+      await user.type(screen.getByLabelText(/^note title$/i), 'My Title');
 
-    const canvas = screen.getByRole('textbox', { name: /note content/i });
-    setCanvasContent(canvas, '');
-    fireEvent.submit(canvas.closest('form'));
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/enter note content/i)
-    );
+      const canvas = screen.getByRole('textbox', { name: /note content/i });
+      setCanvasContent(canvas, '');
+      fireEvent.submit(canvas.closest('form'));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(/enter note content/i)
+      );
+    } catch (error) {
+      throw new Error(`Failed asserting content-empty validation in NoteEditor: ${error.message}`);
+    }
   });
 });
 
 describe('NoteEditor — successful save', () => {
   it('calls onSave with the note data when form is valid', async () => {
-    const onSave = jest.fn();
+    try {
+      const onSave = jest.fn();
 
-    const existingNote = {
-      _id: 'n99',
-      title: 'Pre-filled Title',
-      content: '<p>Pre-filled content</p>',
-      tags: [],
-    };
-    const { user } = renderEditor({ onSave, initialNote: existingNote });
+      const existingNote = {
+        _id: 'n99',
+        title: 'Pre-filled Title',
+        content: '<p>Pre-filled content</p>',
+        tags: [],
+      };
+      const { user } = renderEditor({ onSave, initialNote: existingNote });
 
+      const canvas = screen.getByRole('textbox', { name: /note content/i });
+      setCanvasContent(canvas, 'Pre-filled content');
 
-    const canvas = screen.getByRole('textbox', { name: /note content/i });
-    setCanvasContent(canvas, 'Pre-filled content');
+      await user.click(screen.getByRole('button', { name: /update note/i }));
 
-    await user.click(screen.getByRole('button', { name: /update note/i }));
-
-    await waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Pre-filled Title' })
-      )
-    );
+      await waitFor(() =>
+        expect(onSave).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'Pre-filled Title' })
+        )
+      );
+    } catch (error) {
+      throw new Error(`Failed asserting onSave payload in NoteEditor: ${error.message}`);
+    }
   });
 });
 
 describe('NoteEditor — tag management', () => {
   it('adds a tag on Enter key in the tag input', async () => {
-    const { user } = renderEditor();
-    const tagInput = screen.getByLabelText(/^tags$/i);
+    try {
+      const { user } = renderEditor();
+      const tagInput = screen.getByLabelText(/^tags$/i);
 
-    await user.type(tagInput, 'mytag{Enter}');
+      await user.type(tagInput, 'mytag{Enter}');
 
-    expect(screen.getByText('#mytag')).toBeInTheDocument();
+      expect(screen.getByText('#mytag')).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting tag add on Enter in NoteEditor: ${error.message}`);
+    }
   });
 
   it('adds a tag on comma key in the tag input', async () => {
-    const { user } = renderEditor();
-    const tagInput = screen.getByLabelText(/^tags$/i);
+    try {
+      const { user } = renderEditor();
+      const tagInput = screen.getByLabelText(/^tags$/i);
 
-    await user.type(tagInput, 'worktag,');
+      await user.type(tagInput, 'worktag,');
 
-    expect(screen.getByText('#worktag')).toBeInTheDocument();
+      expect(screen.getByText('#worktag')).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting tag add on comma in NoteEditor: ${error.message}`);
+    }
   });
 
   it('removes a tag when its × button is clicked', async () => {
-    const { user } = renderEditor({
-      initialNote: { _id: 'n1', title: 'T', content: 'C', tags: ['removeme'] },
-    });
+    try {
+      const { user } = renderEditor({
+        initialNote: { _id: 'n1', title: 'T', content: 'C', tags: ['removeme'] },
+      });
 
-    expect(screen.getByText('#removeme')).toBeInTheDocument();
-    await user.click(screen.getByTitle(/remove #removeme/i));
-    expect(screen.queryByText('#removeme')).not.toBeInTheDocument();
+      expect(screen.getByText('#removeme')).toBeInTheDocument();
+      await user.click(screen.getByTitle(/remove #removeme/i));
+      expect(screen.queryByText('#removeme')).not.toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting tag removal in NoteEditor: ${error.message}`);
+    }
   });
 
   it('does not add a duplicate tag', async () => {
-    const { user } = renderEditor({
-      initialNote: { _id: 'n1', title: 'T', content: 'C', tags: ['dup'] },
-    });
+    try {
+      const { user } = renderEditor({
+        initialNote: { _id: 'n1', title: 'T', content: 'C', tags: ['dup'] },
+      });
 
-    await user.type(screen.getByLabelText(/^tags$/i), 'dup{Enter}');
+      await user.type(screen.getByLabelText(/^tags$/i), 'dup{Enter}');
 
-    // Only one chip for "dup" should exist
-    expect(screen.getAllByText('#dup')).toHaveLength(1);
+      // Only one chip for "dup" should exist
+      expect(screen.getAllByText('#dup')).toHaveLength(1);
+    } catch (error) {
+      throw new Error(`Failed asserting duplicate tag prevention in NoteEditor: ${error.message}`);
+    }
   });
 });
 
 describe('NoteEditor — cancel behaviour', () => {
   it('calls onCancel when the Cancel button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderEditor({ onCancel });
-    await user.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderEditor({ onCancel });
+      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting Cancel button callback in NoteEditor: ${error.message}`);
+    }
   });
 
   it('calls onCancel when the close (×) icon button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderEditor({ onCancel });
-    await user.click(screen.getByRole('button', { name: /close editor/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderEditor({ onCancel });
+      await user.click(screen.getByRole('button', { name: /close editor/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting close icon callback in NoteEditor: ${error.message}`);
+    }
   });
 });
 

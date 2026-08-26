@@ -20,7 +20,7 @@ module.exports = {
 
   // Stub out CSS/asset imports so Jest never tries to parse them
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': '<rootDir>/src/test/__mocks__/fileMock.js',
+    '\\.(css|less|scss|sass)$': '<rootDir>/src/test/__mocks__/styleMock.js',
     '\\.(png|jpg|jpeg|gif|svg|webp)$': '<rootDir>/src/test/__mocks__/fileMock.js',
   },
 

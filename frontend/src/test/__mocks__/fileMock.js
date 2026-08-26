@@ -1,3 +1,2 @@
-// Stub for CSS, image, and other static asset imports.
-// Jest cannot process these files; returning an empty object prevents import errors.
-module.exports = {};
+﻿// Stub for image and static media asset imports
+module.exports = 'test-file-stub';

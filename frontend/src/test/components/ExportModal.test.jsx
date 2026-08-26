@@ -2,9 +2,7 @@
 import userEvent from '@testing-library/user-event';
 import ExportModal from '../../components/ExportModal';
 
-
 // Shared fixtures
-
 
 const NOTE_A = { _id: 'n1', title: 'Alpha Note', content: '<p>Hello</p>', tags: ['work'] };
 const NOTE_B = { _id: 'n2', title: 'Beta Note', content: '<p>World</p>', tags: [] };
@@ -25,9 +23,7 @@ function renderModal(overrides = {}) {
   return { user, props };
 }
 
-
 // Tests
-
 
 describe('ExportModal — visibility', () => {
   it('renders nothing when isOpen is false', () => {
@@ -48,17 +44,25 @@ describe('ExportModal — visibility', () => {
 
 describe('ExportModal — cancel paths', () => {
   it('calls onCancel when Cancel button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderModal({ onCancel });
-    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderModal({ onCancel });
+      await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting Cancel button click in ExportModal: ${error.message}`);
+    }
   });
 
   it('calls onCancel when close (×) icon button is clicked', async () => {
-    const onCancel = jest.fn();
-    const { user } = renderModal({ onCancel });
-    await user.click(screen.getByRole('button', { name: /close export dialog/i }));
-    expect(onCancel).toHaveBeenCalled();
+    try {
+      const onCancel = jest.fn();
+      const { user } = renderModal({ onCancel });
+      await user.click(screen.getByRole('button', { name: /close export dialog/i }));
+      expect(onCancel).toHaveBeenCalled();
+    } catch (error) {
+      throw new Error(`Failed asserting close icon click in ExportModal: ${error.message}`);
+    }
   });
 
   it('calls onCancel when Escape key is pressed', () => {
@@ -84,10 +88,14 @@ describe('ExportModal — "Export All" mode (default)', () => {
   });
 
   it('calls onExport with ALL notes when Export button is clicked in all-mode', async () => {
-    const onExport = jest.fn();
-    const { user } = renderModal({ onExport });
-    await user.click(screen.getByRole('button', { name: /export 3 notes/i }));
-    expect(onExport).toHaveBeenCalledWith([NOTE_A, NOTE_B, NOTE_C]);
+    try {
+      const onExport = jest.fn();
+      const { user } = renderModal({ onExport });
+      await user.click(screen.getByRole('button', { name: /export 3 notes/i }));
+      expect(onExport).toHaveBeenCalledWith([NOTE_A, NOTE_B, NOTE_C]);
+    } catch (error) {
+      throw new Error(`Failed asserting export all notes in ExportModal: ${error.message}`);
+    }
   });
 
   it('shows singular "Export 1 Note" when notes array has one entry', () => {
@@ -102,78 +110,105 @@ describe('ExportModal — "Select Notes" custom mode', () => {
   }
 
   it('shows a list of note checkboxes when custom mode is selected', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    // All notes start selected
-    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+    } catch (error) {
+      throw new Error(`Failed asserting checkbox list rendering in custom export mode: ${error.message}`);
+    }
   });
 
   it('all notes are pre-selected when entering custom mode', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    const checkboxes = screen.getAllByRole('checkbox');
-    checkboxes.forEach((cb) => expect(cb).toHaveAttribute('aria-checked', 'true'));
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      const checkboxes = screen.getAllByRole('checkbox');
+      checkboxes.forEach((cb) => expect(cb).toHaveAttribute('aria-checked', 'true'));
+    } catch (error) {
+      throw new Error(`Failed asserting pre-selected checkboxes in custom export mode: ${error.message}`);
+    }
   });
 
   it('unchecking a note removes it from the count', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-
-    await user.click(screen.getByRole('checkbox', { name: /select alpha note/i }));
-    expect(
-      screen.getByRole('button', { name: /export 2 notes/i })
-    ).toBeInTheDocument();
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      await user.click(screen.getByRole('checkbox', { name: /select alpha note/i }));
+      expect(
+        screen.getByRole('button', { name: /export 2 notes/i })
+      ).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting deselect note count change in custom export mode: ${error.message}`);
+    }
   });
 
   it('calls onExport with only selected notes on confirm', async () => {
-    const onExport = jest.fn();
-    const { user } = renderModal({ onExport });
-    await switchToCustom(user);
-
-    await user.click(screen.getByRole('checkbox', { name: /select beta note/i }));
-
-    await user.click(screen.getByRole('checkbox', { name: /select gamma note/i }));
-    await user.click(screen.getByRole('button', { name: /export 1 note/i }));
-    expect(onExport).toHaveBeenCalledWith([NOTE_A]);
+    try {
+      const onExport = jest.fn();
+      const { user } = renderModal({ onExport });
+      await switchToCustom(user);
+      await user.click(screen.getByRole('checkbox', { name: /select beta note/i }));
+      await user.click(screen.getByRole('checkbox', { name: /select gamma note/i }));
+      await user.click(screen.getByRole('button', { name: /export 1 note/i }));
+      expect(onExport).toHaveBeenCalledWith([NOTE_A]);
+    } catch (error) {
+      throw new Error(`Failed asserting custom selection export payload: ${error.message}`);
+    }
   });
 
   it('disables the Export button when 0 notes are selected', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    await user.click(screen.getByRole('button', { name: /deselect all/i }));
-    expect(screen.getByRole('button', { name: /export 0 notes/i })).toBeDisabled();
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      await user.click(screen.getByRole('button', { name: /deselect all/i }));
+      expect(screen.getByRole('button', { name: /export 0 notes/i })).toBeDisabled();
+    } catch (error) {
+      throw new Error(`Failed asserting disabled export button on zero selection: ${error.message}`);
+    }
   });
 
   it('"Select All" re-selects all notes after deselecting', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    await user.click(screen.getByRole('button', { name: /deselect all/i }));
-    await user.click(screen.getByRole('button', { name: /^select all$/i }));
-    expect(
-      screen.getByRole('button', { name: /export 3 notes/i })
-    ).toBeInTheDocument();
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      await user.click(screen.getByRole('button', { name: /deselect all/i }));
+      await user.click(screen.getByRole('button', { name: /^select all$/i }));
+      expect(
+        screen.getByRole('button', { name: /export 3 notes/i })
+      ).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting select all functionality in custom export mode: ${error.message}`);
+    }
   });
 
   it('filters the note list as the user types in the search box', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    await user.type(screen.getByPlaceholderText(/filter notes/i), 'Alpha');
-    expect(screen.getAllByRole('checkbox')).toHaveLength(1);
-    expect(screen.getByRole('checkbox', { name: /select alpha note/i })).toBeInTheDocument();
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      await user.type(screen.getByPlaceholderText(/filter notes/i), 'Alpha');
+      expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+      expect(screen.getByRole('checkbox', { name: /select alpha note/i })).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting search filtering in custom export mode: ${error.message}`);
+    }
   });
 
   it('shows "No notes match your filter" when search has no results', async () => {
-    const { user } = renderModal();
-    await switchToCustom(user);
-    await user.type(screen.getByPlaceholderText(/filter notes/i), 'zzznomatch');
-    expect(screen.getByText(/no notes match your filter/i)).toBeInTheDocument();
+    try {
+      const { user } = renderModal();
+      await switchToCustom(user);
+      await user.type(screen.getByPlaceholderText(/filter notes/i), 'zzznomatch');
+      expect(screen.getByText(/no notes match your filter/i)).toBeInTheDocument();
+    } catch (error) {
+      throw new Error(`Failed asserting no-match message in custom export mode: ${error.message}`);
+    }
   });
 });
 
 describe('ExportModal — empty notes list', () => {
   it('disables the Export button when notes array is empty', () => {
     renderModal({ notes: [] });
-
     expect(screen.getByRole('button', { name: /export 0 notes/i })).toBeDisabled();
   });
 });

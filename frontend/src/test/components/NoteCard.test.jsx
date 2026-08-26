@@ -2,9 +2,7 @@
 import userEvent from '@testing-library/user-event';
 import NoteCard from '../../components/NoteCard';
 
-
 // Module mocks
-
 
 // DOMPurify 
 jest.mock('dompurify', () => ({ sanitize: (html) => html }));
@@ -41,7 +39,6 @@ function renderCard(overrides = {}) {
   return { user, props };
 }
 
-
 // Tests
 
 describe('NoteCard — basic rendering', () => {
@@ -62,7 +59,6 @@ describe('NoteCard — basic rendering', () => {
 
   it('shows formatted date when updatedAt is provided', () => {
     renderCard();
-
     const article = screen.getByRole('article');
     expect(article).toHaveTextContent(/Jan/i);
   });
@@ -85,28 +81,40 @@ describe('NoteCard — normal mode actions', () => {
   });
 
   it('calls onEdit when the Edit button is clicked', async () => {
-    const onEdit = jest.fn();
-    const { user } = renderCard({ onEdit });
-    await user.click(screen.getByRole('button', { name: /edit my test note/i }));
-    expect(onEdit).toHaveBeenCalledWith(BASE_NOTE);
+    try {
+      const onEdit = jest.fn();
+      const { user } = renderCard({ onEdit });
+      await user.click(screen.getByRole('button', { name: /edit my test note/i }));
+      expect(onEdit).toHaveBeenCalledWith(BASE_NOTE);
+    } catch (error) {
+      throw new Error(`Failed asserting onEdit callback on edit button click: ${error.message}`);
+    }
   });
 
   it('calls onDelete when the Move-to-trash button is clicked', async () => {
-    const onDelete = jest.fn();
-    const { user } = renderCard({ onDelete });
-    await user.click(
-      screen.getByRole('button', { name: /move my test note to trash/i })
-    );
-    expect(onDelete).toHaveBeenCalledWith(BASE_NOTE);
+    try {
+      const onDelete = jest.fn();
+      const { user } = renderCard({ onDelete });
+      await user.click(
+        screen.getByRole('button', { name: /move my test note to trash/i })
+      );
+      expect(onDelete).toHaveBeenCalledWith(BASE_NOTE);
+    } catch (error) {
+      throw new Error(`Failed asserting onDelete callback on trash button click: ${error.message}`);
+    }
   });
 
   it('calls onEdit when the title button is clicked', async () => {
-    const onEdit = jest.fn();
-    const { user } = renderCard({ onEdit });
-    await user.click(
-      screen.getByRole('button', { name: /open note: my test note/i })
-    );
-    expect(onEdit).toHaveBeenCalledWith(BASE_NOTE);
+    try {
+      const onEdit = jest.fn();
+      const { user } = renderCard({ onEdit });
+      await user.click(
+        screen.getByRole('button', { name: /open note: my test note/i })
+      );
+      expect(onEdit).toHaveBeenCalledWith(BASE_NOTE);
+    } catch (error) {
+      throw new Error(`Failed asserting onEdit callback on title click: ${error.message}`);
+    }
   });
 });
 
@@ -137,23 +145,31 @@ describe('NoteCard — trash mode', () => {
   });
 
   it('calls onRestore when the Restore button is clicked', async () => {
-    const onRestore = jest.fn();
-    const { user } = renderCard({ note: TRASH_NOTE, isTrashMode: true, onRestore });
-    await user.click(screen.getByRole('button', { name: /restore my test note/i }));
-    expect(onRestore).toHaveBeenCalledWith(TRASH_NOTE);
+    try {
+      const onRestore = jest.fn();
+      const { user } = renderCard({ note: TRASH_NOTE, isTrashMode: true, onRestore });
+      await user.click(screen.getByRole('button', { name: /restore my test note/i }));
+      expect(onRestore).toHaveBeenCalledWith(TRASH_NOTE);
+    } catch (error) {
+      throw new Error(`Failed asserting onRestore callback on restore button click: ${error.message}`);
+    }
   });
 
   it('calls onPermanentDelete when the permanent-delete button is clicked', async () => {
-    const onPermanentDelete = jest.fn();
-    const { user } = renderCard({
-      note: TRASH_NOTE,
-      isTrashMode: true,
-      onPermanentDelete,
-    });
-    await user.click(
-      screen.getByRole('button', { name: /permanently delete my test note/i })
-    );
-    expect(onPermanentDelete).toHaveBeenCalledWith(TRASH_NOTE);
+    try {
+      const onPermanentDelete = jest.fn();
+      const { user } = renderCard({
+        note: TRASH_NOTE,
+        isTrashMode: true,
+        onPermanentDelete,
+      });
+      await user.click(
+        screen.getByRole('button', { name: /permanently delete my test note/i })
+      );
+      expect(onPermanentDelete).toHaveBeenCalledWith(TRASH_NOTE);
+    } catch (error) {
+      throw new Error(`Failed asserting onPermanentDelete callback on delete forever button click: ${error.message}`);
+    }
   });
 
   it('displays retention time from getRetentionTimeLeft', () => {
@@ -163,11 +179,9 @@ describe('NoteCard — trash mode', () => {
 
   it('shows the note title as a plain span (not a clickable button) in trash mode', () => {
     renderCard({ note: TRASH_NOTE, isTrashMode: true });
-
     expect(
       screen.queryByRole('button', { name: /open note: my test note/i })
     ).not.toBeInTheDocument();
-    // Title text 
     expect(screen.getByText('My Test Note')).toBeInTheDocument();
   });
 });
@@ -180,10 +194,14 @@ describe('NoteCard — tags', () => {
   });
 
   it('calls onTagClick with the tag name when a tag is clicked', async () => {
-    const onTagClick = jest.fn();
-    const { user } = renderCard({ tags: ['react'], onTagClick });
-    await user.click(screen.getByTitle(/filter notes with #react/i));
-    expect(onTagClick).toHaveBeenCalledWith('react');
+    try {
+      const onTagClick = jest.fn();
+      const { user } = renderCard({ tags: ['react'], onTagClick });
+      await user.click(screen.getByTitle(/filter notes with #react/i));
+      expect(onTagClick).toHaveBeenCalledWith('react');
+    } catch (error) {
+      throw new Error(`Failed asserting onTagClick callback on tag pill click: ${error.message}`);
+    }
   });
 
   it('renders no tag buttons when tags array is empty', () => {
