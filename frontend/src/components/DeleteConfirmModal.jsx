@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Trash2, X, Loader2, AlertTriangle } from 'lucide-react';
+import '../styles/Modals.css';
 
 /**
  * @typedef {Object} Note

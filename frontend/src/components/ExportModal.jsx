@@ -1,24 +1,25 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Download, X, CheckSquare, Square, Search } from 'lucide-react';
+import '../styles/Modals.css';
 
 /**
  * @typedef {Object} Note
- * @property {string} _id - Unique identifier for the note
- * @property {string} title - Title of the note
- * @property {string} content - HTML or text content of the note
- * @property {string[]} [tags] - List of tag labels associated with the note
- * @property {string} [createdAt] - Creation ISO date timestamp
- * @property {string} [updatedAt] - Last updated ISO date timestamp
+ * @property {string} _id 
+ * @property {string} title 
+ * @property {string} content 
+ * @property {string[]} [tags] 
+ * @property {string} [createdAt] 
+ * @property {string} [updatedAt] 
  */
 
 /**
  * ExportModal allows users to export all or custom selected notes as a JSON backup file.
  * @param {Object} props
- * @param {boolean} props.isOpen - Whether the export modal is open
- * @param {Note[]} [props.notes=[]] - Array of notes available for export
- * @param {Record<string, string[]>} [props.tagsMap={}] - Map of note IDs to their respective tags
- * @param {(notesToExport: Note[]) => void} props.onExport - Callback invoked with selected notes to export
- * @param {() => void} props.onCancel - Callback to close or cancel modal
+ * @param {boolean} props.isOpen 
+ * @param {Note[]} [props.notes=[]] 
+ * @param {Record<string, string[]>} [props.tagsMap={}] 
+ * @param {(notesToExport: Note[]) => void} props.onExport 
+ * @param {() => void} props.onCancel 
  * @returns {React.ReactNode}
  */
 export default function ExportModal({
@@ -28,22 +29,20 @@ export default function ExportModal({
   onExport,
   onCancel,
 }) {
-  const [exportMode, setExportMode] = useState('all'); // 'all' | 'custom'
+  const [exportMode, setExportMode] = useState('all');
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Reset or initialize selection when modal opens
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setExportMode('all');
       setSelectedIds(new Set(notes.map((n) => n._id)));
       setSearchQuery('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [isOpen]);
 
-  // Keyboard accessibility for escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {

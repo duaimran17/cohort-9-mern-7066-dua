@@ -1,6 +1,7 @@
 import DOMPurify from 'dompurify';
 import { Edit3, Trash2, Clock, RotateCcw, Tag as TagIcon, AlertCircle } from 'lucide-react';
 import { getRetentionTimeLeft } from '../utils/notesStorage';
+import '../styles/NoteCard.css';
 
 /**
  * Formats ISO date string into a friendly, human-readable format

@@ -1,0 +1,165 @@
+/* ==========================================================================
+   SHINE Notes - Rich Markdown Rendering Styles
+   ========================================================================== */
+
+.markdown-body {
+  color: rgba(226, 232, 240, 0.9);
+  line-height: 1.6;
+}
+
+.markdown-body.is-compact {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.md-h1 {
+  font-family: Outfit, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.6rem 0 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.25rem;
+}
+
+.md-h1.compact {
+  font-size: 1rem;
+  margin: 0.2rem 0;
+  border: none;
+  padding: 0;
+}
+
+.md-h2 {
+  font-family: Outfit, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f3e8ff;
+  margin: 0.5rem 0 0.3rem 0;
+}
+
+.md-h2.compact {
+  font-size: 0.925rem;
+  margin: 0.2rem 0;
+}
+
+.md-h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e9d5ff;
+  margin: 0.4rem 0 0.25rem 0;
+}
+
+.md-h3.compact {
+  font-size: 0.875rem;
+  margin: 0.15rem 0;
+}
+
+.md-h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #d8b4fe;
+  margin: 0.35rem 0 0.2rem 0;
+}
+
+.md-bold {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.md-italic {
+  font-style: italic;
+  color: #e9d5ff;
+}
+
+.md-del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.md-blockquote {
+  border-left: 3px solid #a855f7;
+  padding: 0.4rem 0.85rem;
+  margin: 0.5rem 0;
+  background: rgba(168, 85, 247, 0.08);
+  border-radius: 0 8px 8px 0;
+  color: #e9d5ff;
+  font-style: italic;
+}
+
+.md-blockquote.compact {
+  padding: 0.15rem 0.5rem;
+  margin: 0.2rem 0;
+}
+
+.md-ul {
+  list-style-type: disc;
+  margin: 0.4rem 0 0.4rem 1.25rem;
+  padding: 0;
+}
+
+.md-ul.compact {
+  margin: 0.15rem 0 0.15rem 1rem;
+}
+
+.md-ol {
+  list-style-type: decimal;
+  margin: 0.4rem 0 0.4rem 1.25rem;
+  padding: 0;
+}
+
+.md-ol.compact {
+  margin: 0.15rem 0 0.15rem 1rem;
+}
+
+.md-li {
+  margin-bottom: 0.25rem;
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.md-code-inline {
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.825em;
+  color: #f3e8ff;
+}
+
+.md-code-block-container {
+  border-radius: 12px;
+  background: #0f071c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.md-code-lang {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-family: monospace;
+  text-transform: uppercase;
+  color: rgba(216, 180, 254, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.md-pre {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+}
+
+.md-code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  color: #e9d5ff;
+  line-height: 1.5;
+}
+
+.md-p {
+  margin: 0 0 0.5rem 0;
+}
+
+.md-p.compact {
+  margin: 0 0 0.25rem 0;
+}

@@ -15,6 +15,7 @@ import {
   Plus,
 } from 'lucide-react';
 import ErrorBanner from './ErrorBanner';
+import '../styles/NoteEditor.css';
 
 function NoteEditorForm({
   initialNote,
