@@ -343,23 +343,29 @@ describe('notesStorage', () => {
     test('rejects when FileReader triggers onerror', async () => {
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
       const origRead = FileReader.prototype.readAsText;
-      FileReader.prototype.readAsText = function () {
-        if (this.onerror) this.onerror();
-      };
+      try {
+        FileReader.prototype.readAsText = function () {
+          if (this.onerror) this.onerror();
+        };
 
-      await expect(parseImportFile(file)).rejects.toThrow('File reading error.');
-      FileReader.prototype.readAsText = origRead;
+        await expect(parseImportFile(file)).rejects.toThrow('File reading error.');
+      } finally {
+        FileReader.prototype.readAsText = origRead;
+      }
     });
 
     test('rejects when FileReader result is not a string', async () => {
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
       const origRead = FileReader.prototype.readAsText;
-      FileReader.prototype.readAsText = function () {
-        if (this.onload) this.onload({ target: { result: 12345 } });
-      };
+      try {
+        FileReader.prototype.readAsText = function () {
+          if (this.onload) this.onload({ target: { result: 12345 } });
+        };
 
-      await expect(parseImportFile(file)).rejects.toThrow('Failed to read file content.');
-      FileReader.prototype.readAsText = origRead;
+        await expect(parseImportFile(file)).rejects.toThrow('Failed to read file content.');
+      } finally {
+        FileReader.prototype.readAsText = origRead;
+      }
     });
 
     test('rejects when valid JSON has no non-empty notes', async () => {

@@ -1,6 +1,6 @@
 # SHINE Notes — Backend API
 
-Node.js and Express RESTful API powering the SHINE Notes platform, featuring MongoDB/Mongoose ORM integration, JWT authentication, and structured error handling.
+Node.js and Express RESTful API powering the SHINE Notes platform, featuring MongoDB/Mongoose ODM integration, JWT authentication, and structured error handling.
 
 ## ✨ Key Features
 
