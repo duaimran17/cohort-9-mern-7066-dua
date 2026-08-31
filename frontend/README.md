@@ -1,16 +1,52 @@
-# React + Vite
+# SHINE Notes — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for the Notes App — a full-featured notes manager with authentication, tagging, rich-text editing, trash/restore, and export/import.
 
-Currently, two official plugins are available:
+## Features
+- Email/password authentication (signup, signin, logout)
+- Notes CRUD with rich-text (WYSIWYG) editing
+- Tag-based and search bar organization and filtering
+- 7-day soft-delete trash with auto purge
+- Export notes to JSON, and import from the same formats
+- Responsive layout with dashboard, editor modal, and export/delete modals
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- React (Vite)
+- Axios for API calls
+- Jest + React Testing Library for unit testing
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Install dependencies
+```bash
+npm install
+```
 
-## Expanding the ESLint configuration
+### Run the dev server
+```bash
+npm run dev
+```
+Runs at `http://localhost:5173` by default.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Run tests
+```bash
+npm test
+```
+
+### Run tests with coverage
+```bash
+npx jest --coverage
+```
+
+## Project Structure
+src/
+api/ - Axios API clients (auth, notes)
+components/ - Reusable UI components (NoteCard, NoteEditor, modals, etc.)
+pages/ - Top-level pages (AuthPage)
+styles/ - Per-component CSS
+utils/ - Client-side storage/helper utilities (tags, trash, import/export)
+test/ - Jest + RTL test suites, mirroring src/ structure
+
+
+## Environment
+This app expects the backend API to be running (see `../backend/README.md`). Configure the API base URL via environment variables if needed.

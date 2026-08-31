@@ -3,4 +3,16 @@ module.exports = {
     ['@babel/preset-env', { targets: { node: 'current' } }],
     ['@babel/preset-react', { runtime: 'automatic' }],
   ],
+  plugins: [
+    function () {
+      return {
+        visitor: {
+          MetaProperty(path) {
+            path.replaceWithSourceString('{ env: process.env }');
+          },
+        },
+      };
+    },
+  ],
 };
+
