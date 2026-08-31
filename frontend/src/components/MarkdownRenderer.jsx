@@ -1,17 +1,13 @@
+import '../styles/MarkdownRenderer.css';
+
 /**
- * Parses inline markdown tokens: bold, italic, code, strikethrough
+ * inline markdown tokens: bold, italic, code, strikethrough
  * @param {string} text
  * @returns {React.ReactNode[]}
  */
 function parseInlineMarkdown(text) {
   if (!text) return [];
 
-  // Match:
-  // 1. Inline code: `...`
-  // 2. Bold + Italic: ***...*** or ___...___
-  // 3. Bold: **...** or __...__
-  // 4. Italic: *...* or _..._ (word-bounded)
-  // 5. Strikethrough: ~~...~~
   const tokenRegex = /(`[^`]+`|\*\*\*[^*]+\*\*\*|___[^_]+___|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|\b_[^_]+_\b|~~[^~]+~~)/g;
 
   const parts = text.split(tokenRegex);
@@ -102,7 +98,7 @@ export default function MarkdownRenderer({ content = '', compact = false }) {
         codeLines.push(lines[i]);
         i++;
       }
-      i++; // skip closing ```
+      i++;
       elements.push(
         <div key={`code-${elements.length}`} className="md-code-block-container my-2">
           {lang && <div className="md-code-lang">{lang}</div>}
@@ -114,7 +110,7 @@ export default function MarkdownRenderer({ content = '', compact = false }) {
       continue;
     }
 
-    // Headings (#, ##, ###, ####)
+    // Headings 
     const h1Match = line.match(/^#\s+(.+)$/);
     if (h1Match) {
       elements.push(

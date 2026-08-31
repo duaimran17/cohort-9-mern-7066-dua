@@ -1,0 +1,246 @@
+/* ==========================================================================
+   SHINE Notes - Note Card Component Styles
+   ========================================================================== */
+
+.note-card {
+  background: rgba(30, 16, 53, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.note-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+  background: rgba(36, 19, 64, 0.75);
+}
+
+.note-card.is-trashed {
+  border-color: rgba(244, 63, 94, 0.25);
+  cursor: default;
+}
+
+.note-card.is-trashed:hover {
+  border-color: rgba(244, 63, 94, 0.45);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(244, 63, 94, 0.2);
+}
+
+.note-card-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.6), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.note-card-top-accent.accent-trash {
+  background: linear-gradient(90deg, transparent, rgba(244, 63, 94, 0.8), transparent);
+}
+
+.note-card:hover .note-card-top-accent {
+  opacity: 1;
+}
+
+.note-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.note-card-title {
+  font-family: Outfit, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.note-card:hover .note-card-actions {
+  opacity: 1;
+}
+
+.note-action-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(226, 232, 240, 0.8);
+  padding: 0.45rem;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-action-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ffffff;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.note-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.note-action-btn.edit:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ffffff;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.note-action-btn.delete:hover {
+  background: rgba(244, 63, 94, 0.3);
+  color: #fca5a5;
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+.note-action-btn.restore:hover {
+  background: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.note-card-content {
+  flex: 1;
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+}
+
+/* Card Rich HTML Preview */
+.note-card-html-preview {
+  font-size: 0.875rem;
+  color: rgba(226, 232, 240, 0.8);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 105px;
+}
+
+.note-card-html-preview h1 {
+  font-family: Outfit, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.15rem 0;
+}
+
+.note-card-html-preview h2 {
+  font-family: Outfit, sans-serif;
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: #f3e8ff;
+  margin: 0.15rem 0;
+}
+
+.note-card-html-preview p {
+  margin: 0 0 0.35rem 0;
+}
+
+.note-card-html-preview strong,
+.note-card-html-preview b {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.note-card-html-preview em,
+.note-card-html-preview i {
+  font-style: italic;
+  color: #e9d5ff;
+}
+
+.note-card-html-preview ul {
+  list-style-type: disc;
+  margin: 0.15rem 0 0.15rem 1.15rem;
+  padding: 0;
+}
+
+.note-card-html-preview ol {
+  list-style-type: decimal;
+  margin: 0.15rem 0 0.15rem 1.15rem;
+  padding: 0;
+}
+
+.note-card-html-preview li {
+  margin-bottom: 0.15rem;
+  color: rgba(226, 232, 240, 0.9);
+}
+
+/* Note Card Tags */
+.note-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.note-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #d8b4fe;
+  font-size: 0.725rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.note-tag-pill:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ffffff;
+  border-color: rgba(168, 85, 247, 0.5);
+}
+
+.note-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.note-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: rgba(216, 180, 254, 0.6);
+}

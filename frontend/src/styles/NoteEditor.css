@@ -1,0 +1,458 @@
+/* ==========================================================================
+   SHINE Notes - Note Editor Modal & WYSIWYG Styles
+   ========================================================================== */
+
+.note-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 20, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 50;
+  animation: fade-in 0.2s ease-out;
+}
+
+.note-editor-modal {
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  background: #190c2e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(139, 92, 246, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: modal-scale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.note-editor-top-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #c026d3, #d946ef);
+}
+
+.note-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.75rem 1rem 1.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.note-editor-title {
+  font-family: Outfit, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.note-editor-subtitle {
+  font-size: 0.8rem;
+  color: rgba(216, 180, 254, 0.7);
+  margin: 0.15rem 0 0 0;
+}
+
+.note-editor-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(226, 232, 240, 0.8);
+  padding: 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-editor-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.note-editor-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.note-editor-body {
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.note-editor-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.note-editor-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: rgba(216, 180, 254, 0.9);
+  margin-bottom: 0.4rem;
+}
+
+.note-editor-counter {
+  font-size: 0.75rem;
+  color: rgba(216, 180, 254, 0.55);
+}
+
+.note-editor-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  background: rgba(30, 16, 53, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.note-editor-input:focus {
+  outline: none;
+  background: rgba(30, 16, 53, 0.95);
+  border-color: rgba(217, 70, 239, 0.6);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Tag Editor Chips & Input */
+.tags-editor-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(30, 16, 53, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  min-height: 48px;
+}
+
+.tags-editor-container:focus-within {
+  border-color: rgba(217, 70, 239, 0.6);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  background: rgba(30, 16, 53, 0.95);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(217, 70, 239, 0.3));
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.tag-chip-remove {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem;
+  border-radius: 50%;
+}
+
+.tag-chip-remove:hover {
+  color: #ffffff;
+  background: rgba(244, 63, 94, 0.35);
+}
+
+.tag-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  outline: none;
+}
+
+.tag-input-field::placeholder {
+  color: rgba(216, 180, 254, 0.4);
+}
+
+.tag-add-btn {
+  background: rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: #ffffff;
+  padding: 0.25rem 0.45rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-add-btn:hover {
+  background: rgba(217, 70, 239, 0.45);
+}
+
+/* Rich Text Formatting Toolbar */
+.rich-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.45rem 0.65rem;
+  background: rgba(20, 10, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: none;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  flex-wrap: wrap;
+}
+
+.rich-tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(216, 180, 254, 0.8);
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.rich-tool-btn:hover {
+  background: rgba(139, 92, 246, 0.25);
+  color: #ffffff;
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.rich-tool-btn.is-active {
+  background: rgba(139, 92, 246, 0.4);
+  color: #ffffff;
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35);
+}
+
+.rich-toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 0.25rem;
+}
+
+/* True Inline WYSIWYG Editable Canvas */
+.note-editor-wysiwyg,
+[contenteditable="true"],
+.note-editor-wysiwyg[contenteditable="true"] {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  width: 100%;
+  padding: 1rem 1.15rem;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  background: rgba(30, 16, 53, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9 !important;
+  caret-color: #a855f7 !important;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  min-height: 220px;
+  max-height: 380px;
+  overflow-y: auto;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+[contenteditable="true"] *,
+.note-editor-wysiwyg * {
+  color: inherit;
+  caret-color: inherit;
+}
+
+.note-editor-wysiwyg font,
+[contenteditable="true"] font {
+  color: inherit !important;
+  caret-color: #a855f7 !important;
+}
+
+.note-editor-wysiwyg:focus,
+[contenteditable="true"]:focus {
+  background: rgba(30, 16, 53, 0.95);
+  border-color: rgba(217, 70, 239, 0.6);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.note-editor-wysiwyg:empty:before,
+[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: rgba(216, 180, 254, 0.4) !important;
+  pointer-events: none;
+  display: block;
+}
+
+.note-editor-wysiwyg h1,
+[contenteditable="true"] h1 {
+  font-family: Outfit, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  caret-color: #a855f7 !important;
+  margin: 0.6rem 0 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.25rem;
+}
+
+.note-editor-wysiwyg h2,
+[contenteditable="true"] h2 {
+  font-family: Outfit, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f3e8ff !important;
+  caret-color: #a855f7 !important;
+  margin: 0.5rem 0 0.3rem 0;
+}
+
+.note-editor-wysiwyg p,
+.note-editor-wysiwyg div,
+.note-editor-wysiwyg span,
+[contenteditable="true"] p,
+[contenteditable="true"] div,
+[contenteditable="true"] span {
+  color: #f1f5f9 !important;
+  caret-color: #a855f7 !important;
+  margin: 0 0 0.5rem 0;
+}
+
+.note-editor-wysiwyg strong,
+.note-editor-wysiwyg b,
+[contenteditable="true"] strong,
+[contenteditable="true"] b {
+  font-weight: 700;
+  color: #ffffff !important;
+}
+
+.note-editor-wysiwyg em,
+.note-editor-wysiwyg i,
+[contenteditable="true"] em,
+[contenteditable="true"] i {
+  font-style: italic;
+  color: #e9d5ff !important;
+}
+
+.note-editor-wysiwyg ul,
+[contenteditable="true"] ul {
+  list-style-type: disc;
+  margin: 0.4rem 0 0.4rem 1.35rem;
+  padding: 0;
+  color: #f1f5f9 !important;
+  caret-color: #a855f7 !important;
+}
+
+.note-editor-wysiwyg ol,
+[contenteditable="true"] ol {
+  list-style-type: decimal;
+  margin: 0.4rem 0 0.4rem 1.35rem;
+  padding: 0;
+  color: #f1f5f9 !important;
+  caret-color: #a855f7 !important;
+}
+
+.note-editor-wysiwyg li,
+[contenteditable="true"] li {
+  margin-bottom: 0.25rem;
+  color: rgba(226, 232, 240, 0.9) !important;
+  caret-color: #a855f7 !important;
+}
+
+.note-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(19, 9, 36, 0.5);
+  flex-shrink: 0;
+}
+
+.note-editor-btn-secondary {
+  padding: 0.7rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-editor-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.note-editor-btn-primary {
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #8b5cf6, #d946ef);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-editor-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(217, 70, 239, 0.5);
+}
+
+.note-editor-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Keyframe animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

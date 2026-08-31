@@ -71,10 +71,7 @@ export default function AuthCard({ initialMode = 'signin', onAuthSuccess, onBack
         // Strict sign-up flow: DO NOT auto-login or store tokens on sign-up
         setSuccessMsg('Account created successfully! Please sign in.');
         setMode('signin');
-        setFormData((prev) => ({
-          ...prev,
-          password: '',
-        }));
+        setFormData({ name: '', email: '', password: '' });
       } else {
         const data = await loginUser({
           email: formData.email.trim(),
